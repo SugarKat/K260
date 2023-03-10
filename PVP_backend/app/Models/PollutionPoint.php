@@ -16,6 +16,5 @@ class Pollution_point extends Model
         'type',
         'isActive',
         'reportCount',
-
     ];
 }
