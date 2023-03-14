@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.natureclean.api.Backend
 import com.natureclean.api.model.Resource
-import com.natureclean.api.model.User
 import com.natureclean.api.model.UserCredentials
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

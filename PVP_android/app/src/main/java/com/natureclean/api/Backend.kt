@@ -5,10 +5,6 @@ import com.natureclean.api.model.Resource
 import com.natureclean.api.model.User
 import com.natureclean.api.model.UserCredentials
 import dagger.hilt.android.scopes.ActivityScoped
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
 import javax.inject.Inject
 
 @ActivityScoped
