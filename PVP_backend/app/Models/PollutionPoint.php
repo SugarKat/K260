@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Pollution_point extends Model
+class PollutionPoint extends Model
 {
     use HasFactory;
 
