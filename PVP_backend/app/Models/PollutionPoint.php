@@ -11,6 +11,7 @@ class PollutionPoint extends Model
 
     protected $fillable = [
         'name',
+	'description',
         'longitude',
         'latitude',
         'rating',

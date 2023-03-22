@@ -26,6 +26,7 @@ class PollutionPointController extends Controller
     {
         $fields = $request->validate([
             'name' => 'required',
+	    'description' => 'max:255',
             'longitude' => 'required',
             'latitude' => 'required',
             'rating' => 'required',
@@ -33,6 +34,7 @@ class PollutionPointController extends Controller
         ]);
         $pollution_point = PollutionPoint::create([
             'name' => $fields['name'],
+	    'description' => $fields['description'],
             'longitude' => $fields['longitude'],
             'latitude' => $fields['latitude'],
             'rating' => $fields['rating'],
