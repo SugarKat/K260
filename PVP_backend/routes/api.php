@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\PollutionPointController;
+use App\Http\Controllers\UserController;
+
 
 
 
@@ -29,8 +31,5 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::post('email/verify-notification', [EmailVerificationController::class, 'sendVerificationEmail']);
     Route::post('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
     Route::resource('pollution-point', PollutionPointController::class);
-});
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    Route::resource('user', UserController::class);
 });

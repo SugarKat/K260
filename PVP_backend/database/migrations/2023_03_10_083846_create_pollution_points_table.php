@@ -17,10 +17,11 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('name');
+            $table->string('description');
             $table->string('longitude');
             $table->string('latitude');
-            $table->string('rating');
-            $table->string('type');
+            $table->integer('rating');
+            $table->integer('type');
             $table->boolean('isActive');
             $table->integer('reportCount');
         });
