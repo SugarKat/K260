@@ -25,12 +25,14 @@ class PollutionPointController extends Controller
     public function store(Request $request)
     {
         $fields = $request->validate([
+            'name' => 'required',
             'longitude' => 'required',
             'latitude' => 'required',
             'rating' => 'required',
             'type' => 'required',
         ]);
         $pollution_point = PollutionPoint::create([
+            'name' => $fields['name'],
             'longitude' => $fields['longitude'],
             'latitude' => $fields['latitude'],
             'rating' => $fields['rating'],

@@ -10,6 +10,7 @@ class PollutionPoint extends Model
     use HasFactory;
 
     protected $fillable = [
+        'name',
         'longitude',
         'latitude',
         'rating',
