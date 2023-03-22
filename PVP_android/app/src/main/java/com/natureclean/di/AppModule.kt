@@ -1,7 +1,6 @@
 package com.natureclean.di
 
 import android.content.Context
-import com.natureclean.BuildConfig
 import com.natureclean.api.Backend
 import com.natureclean.api.BackendInterface
 import com.squareup.moshi.Moshi
@@ -34,23 +33,24 @@ object AppModule {
     fun provideBackendInterface(@ApplicationContext appContext: Context): BackendInterface {
         val client = OkHttpClient.Builder()
 
-
-
         client.addInterceptor {
             val request = it.request()
             val builder = request.newBuilder()
             val url = request.url.newBuilder()
-
-
             it.proceed(builder.addHeader("Accept", "application/json").url(url.build()).build())
         }
 
-        if (BuildConfig.DEBUG) {
-            client.addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
-        }
+        client.addInterceptor(HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        })
 
+        client.authenticator{ _, response ->
+
+            response.request.newBuilder()
+                .header("Authorization", "Bearer 1|XbBAUKcqNqtY3hKKtFxi5MjM2wUsnxr7nnMUTO39")
+                .build()
+
+        }
 
         return Retrofit.Builder()
             .client(client.build())
@@ -61,8 +61,9 @@ object AppModule {
 
                 )
             )
-
-            .baseUrl("http://10.0.2.2:8000/")
+            //http://10.0.2.2:8000/ //EMULATOR
+            //http://192.168.0.101:8000
+            .baseUrl("http://192.168.0.101:8000/")
             .build()
             .create(BackendInterface::class.java)
     }

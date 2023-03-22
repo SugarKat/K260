@@ -4,6 +4,7 @@ import java.net.URLEncoder
 
 sealed class Screen(val route: String){
     object Login : Screen("screen")
+    object Register: Screen("register")
 
     fun withArgs(vararg args: Pair<String, String>): String {
         var res = route

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,11 +13,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.natureclean.api.model.UserCredentials
+import com.natureclean.navigation.Screen
 import com.natureclean.navigation.Tabs
 import com.natureclean.viewmodels.MainViewModel
 
 @Composable
-fun Login(navController: NavController, mainViewModel: MainViewModel) {
+fun Register(navController: NavController, mainViewModel: MainViewModel){
+
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -33,8 +34,15 @@ fun Login(navController: NavController, mainViewModel: MainViewModel) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Login", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+        Text("Register", fontSize = 17.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(16.dp))
+        TextField(
+            value = username,
+            onValueChange = { username = it },
+            placeholder = { Text("username") },
+            label = { Text("username") }
+        )
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
             value = email,
@@ -51,19 +59,27 @@ fun Login(navController: NavController, mainViewModel: MainViewModel) {
 
         )
         Spacer(modifier = Modifier.height(16.dp))
+        TextField(
+            value = passwordConfirmation,
+            onValueChange = { passwordConfirmation = it },
+            visualTransformation = PasswordVisualTransformation(),
+            label = { Text("password") }
+
+        )
         Button(onClick = {
-            mainViewModel.loginUser(
+            mainViewModel.registerUser(
                 userCreds = UserCredentials(
                     name = username,
                     email = email,
                     password = password,
+                    password_confirmation = passwordConfirmation
                 )
             ) {
-                navController.navigate(Tabs.Map.route)
+                navController.navigate(Screen.Login.route)
             }
         }
         ) {
-            Text("Login")
+            Text("Register")
         }
 
         error.apply {

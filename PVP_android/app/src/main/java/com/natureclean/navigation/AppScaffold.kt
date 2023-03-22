@@ -18,6 +18,8 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.maps.model.LatLng
+import com.natureclean.api.model.PollutionPoint
 import com.natureclean.ui.components.MainTopAppBar
 import com.natureclean.viewmodels.MainViewModel
 
@@ -27,13 +29,15 @@ fun AppScaffold() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    var topTitle by remember {mutableStateOf(navController.currentDestination?.route ?: "Map")}
+    var topTitle by remember { mutableStateOf(navController.currentDestination?.route ?: "Map") }
+
     val topBar: @Composable () -> Unit = {
         if (isTab(navBackStackEntry)) {
-            MainTopAppBar(topTitle)
+            MainTopAppBar(topTitle) {
+              mainViewModel.showDialogStatus(true)
+            }
         }
     }
-
     val bottomBar: @Composable () -> Unit = {
         if (isTab(navBackStackEntry)) {
             BottomNavigation(
@@ -56,17 +60,21 @@ fun AppScaffold() {
                 bottomBarTabs.forEach { screen ->
                     val title = screen.title
                     BottomNavigationItem(
-                        icon = { Icon(
-                            Icons.Rounded.Add,
-                            contentDescription = ""
-                        ) },
-                        label = { Text(
-                            title,
-                            fontSize = 10.sp,
-                            fontFamily = FontFamily.Default,
-                            fontWeight = FontWeight.Medium,
-                            letterSpacing = (-0.21).sp
-                        ) },
+                        icon = {
+                            Icon(
+                                Icons.Rounded.Add,
+                                contentDescription = ""
+                            )
+                        },
+                        label = {
+                            Text(
+                                title,
+                                fontSize = 10.sp,
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Medium,
+                                letterSpacing = (-0.21).sp
+                            )
+                        },
                         selectedContentColor = Color.White,
                         unselectedContentColor = Color.Blue,
                         selected = currentRoute == screen.route,
