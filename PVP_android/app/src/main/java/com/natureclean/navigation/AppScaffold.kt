@@ -13,18 +13,21 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.natureclean.ui.components.MainTopAppBar
+import com.natureclean.viewmodels.MainViewModel
 
 @Composable
 fun AppScaffold() {
+    val mainViewModel: MainViewModel = hiltViewModel()
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    var topTitle by remember {mutableStateOf("title")}
+    var topTitle by remember {mutableStateOf(navController.currentDestination?.route ?: "Map")}
     val topBar: @Composable () -> Unit = {
         if (isTab(navBackStackEntry)) {
             MainTopAppBar(topTitle)
@@ -95,6 +98,7 @@ fun AppScaffold() {
     ) {
         Navigation(
             navController = navController,
+            mainViewModel = mainViewModel,
             insetsPadding = it
         )
     }
