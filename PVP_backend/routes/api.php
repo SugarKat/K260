@@ -6,6 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\PollutionPointController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GarbageDisposalPointController;
+
 
 
 
@@ -32,4 +34,6 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::post('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
     Route::resource('pollution-point', PollutionPointController::class);
     Route::resource('user', UserController::class);
+    Route::resource('garbage-disposal-point', GarbageDisposalPointController::class);
 });
+

@@ -13,17 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('pollution_points', function (Blueprint $table) {
+        Schema::create('garbage_disposal_points', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->string('name');
-	        $table->string('description');
+            $table->string('description');
             $table->string('longitude');
             $table->string('latitude');
-            $table->string('rating');
             $table->string('type');
-            $table->boolean('isActive');
-            $table->integer('reportCount');
+            $table->string('size');
+
         });
     }
 
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pollution_points');
+        Schema::dropIfExists('garbage_disposal_points');
     }
 };

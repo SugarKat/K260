@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\PollutionPoint;
-class PollutionPointController extends Controller
+use App\Models\GarbageDisposalPoint;
+
+class GarbageDisposalPointController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,7 +14,7 @@ class PollutionPointController extends Controller
      */
     public function index()
     {
-        return PollutionPoint::all();
+        return GarbageDisposalPoint::all();
     }
 
     /**
@@ -26,24 +27,22 @@ class PollutionPointController extends Controller
     {
         $fields = $request->validate([
             'name' => 'required',
-	        'description' => 'max:255',
+            'description' => 'max:255',
             'longitude' => 'required',
             'latitude' => 'required',
-            'rating' => 'required',
             'type' => 'required',
+            'size' => 'required'
         ]);
-        $pollution_point = PollutionPoint::create([
+        $garbage_disposal_point = GarbageDisposalPoint::create([
             'name' => $fields['name'],
-	        'description' => $fields['description'],
+            'description' => $fields['description'],
             'longitude' => $fields['longitude'],
             'latitude' => $fields['latitude'],
-            'rating' => $fields['rating'],
             'type' => $fields['type'],
-            'isActive' => true,
-            'reportCount' => 0,
+            'size' => $fields['size']
         ]);
 
-        return response($pollution_point, 201);
+        return response($garbage_disposal_point, 201);
     }
 
     /**
@@ -54,7 +53,7 @@ class PollutionPointController extends Controller
      */
     public function show($id)
     {
-        return PollutionPoint::find($id);
+        return GarbageDisposalPoint::find($id);
     }
 
     /**
@@ -66,9 +65,9 @@ class PollutionPointController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $PollutionPoint = PollutionPoint::find($id);
-        $PollutionPoint->update($request -> all());
-        return $PollutionPoint;
+        $garbage_disposal_point = GarbageDisposalPoint::find($id);
+        $garbage_disposal_point->update($request -> all());
+        return $garbage_disposal_point;
     }
 
     /**
@@ -79,6 +78,6 @@ class PollutionPointController extends Controller
      */
     public function destroy($id)
     {
-        return PollutionPoint::destroy($id);
+        return GarbageDisposalPoint::destroy($id);
     }
 }
