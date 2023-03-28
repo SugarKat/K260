@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('latitude');
             $table->string('rating');
             $table->string('type');
-            $table->boolean('isActive');
+            $table->integer('isActive');
             $table->integer('reportCount');
         });
     }

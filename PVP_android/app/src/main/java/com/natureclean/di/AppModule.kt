@@ -47,7 +47,7 @@ object AppModule {
         client.authenticator{ _, response ->
 
             response.request.newBuilder()
-                .header("Authorization", "Bearer 1|XbBAUKcqNqtY3hKKtFxi5MjM2wUsnxr7nnMUTO39")
+                .header("Authorization", "Bearer 1|B5ZaxixRZjsmBhjbi1ZajiHx9jJz6fDGGi8F8xDj")
                 .build()
 
         }
@@ -63,7 +63,7 @@ object AppModule {
             )
             //http://10.0.2.2:8000/ //EMULATOR
             //http://192.168.0.101:8000
-            .baseUrl("http://192.168.0.101:8000/")
+            .baseUrl("http://192.168.0.105:8000/")
             .build()
             .create(BackendInterface::class.java)
     }

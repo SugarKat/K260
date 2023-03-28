@@ -1,10 +1,7 @@
 package com.natureclean.ui.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -29,14 +26,17 @@ fun MainTopAppBar(title: String, addPoint: () -> Unit) {
             modifier= Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-//            Text(
-//                text = title,
-//                color = Color.Blue,
-//                fontSize = 16.sp,
-//                lineHeight = 20.sp,
-//                fontWeight = FontWeight.Bold
-//            )
-            Icon(imageVector = Icons.Default.Add, contentDescription = "", modifier = Modifier.clickable {
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = title,
+                color = Color.Blue,
+                fontSize = 16.sp,
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.Bold,
+
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(imageVector = Icons.Default.Add, contentDescription = "", modifier = Modifier.padding(end = 16.dp).clickable {
                 addPoint()
             })
         }

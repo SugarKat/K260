@@ -34,6 +34,7 @@ fun AppScaffold() {
     val topBar: @Composable () -> Unit = {
         if (isTab(navBackStackEntry)) {
             MainTopAppBar(topTitle) {
+                mainViewModel.topBarAction(navController.currentDestination?.route)
               mainViewModel.showDialogStatus(true)
             }
         }

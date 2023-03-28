@@ -31,7 +31,7 @@ fun Navigation(
                 )
         }
         composable(Tabs.Map.route) { Map(mainViewModel = mainViewModel) }
-        composable(Tabs.Containers.route) { Containers() }
+        composable(Tabs.Containers.route) { Containers(mainViewModel) }
         composable(Screen.Login.route) {
             Login(navController, mainViewModel)
         }

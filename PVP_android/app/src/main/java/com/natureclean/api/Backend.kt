@@ -1,10 +1,7 @@
 package com.natureclean.api
 
 import android.util.Log
-import com.natureclean.api.model.PollutionPoint
-import com.natureclean.api.model.Resource
-import com.natureclean.api.model.User
-import com.natureclean.api.model.UserCredentials
+import com.natureclean.api.model.*
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
@@ -52,6 +49,44 @@ class Backend @Inject constructor(
         return Resource.Success(response)
     }
 
+    suspend fun updateUser(user: UserObj, points: Int): Resource<UserObj> {
+        val response = try {
+            api.updateUser(id = user.id, user = user.copy(points = points))
+        } catch (e: Exception) {
+            Log.i("error", e.toString())
+            return Resource.Error(e.message ?: "Error")
+        }
+        return Resource.Success(response)
+    }
+    suspend fun updatePoint(point: PollutionPoint): Resource<PollutionPoint>{
+        val response = try {
+            api.updatePoint(id = point.id!!, pollutionPoint = point)
+        } catch (e: Exception) {
+            Log.i("error", e.toString())
+            return Resource.Error(e.message ?: "Error")
+        }
+        return Resource.Success(response)
+    }
+
+    suspend fun addContainer(container: Container): Resource<Container>{
+        val response = try {
+            api.addContainer(container)
+        } catch (e: Exception) {
+            Log.i("error", e.toString())
+            return Resource.Error(e.message ?: "Error")
+        }
+        return Resource.Success(response)
+    }
+
+    suspend fun getContainers(): Resource<List<Container>>{
+        val response = try {
+            api.getContainers()
+        } catch (e: Exception) {
+            Log.i("error", e.toString())
+            return Resource.Error(e.message ?: "Error")
+        }
+        return Resource.Success(response)
+    }
 
 
 

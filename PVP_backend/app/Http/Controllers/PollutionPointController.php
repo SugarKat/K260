@@ -39,7 +39,7 @@ class PollutionPointController extends Controller
             'latitude' => $fields['latitude'],
             'rating' => $fields['rating'],
             'type' => $fields['type'],
-            'isActive' => true,
+            'isActive' => 1,
             'reportCount' => 0,
         ]);
 

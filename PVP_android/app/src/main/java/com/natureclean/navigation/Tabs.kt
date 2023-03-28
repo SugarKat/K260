@@ -8,5 +8,5 @@ sealed class Tabs(val route: String, val title: String) {
 }
 
 val bottomBarTabs = listOf(
-    Tabs.Map, Tabs.Containers, Tabs.Account
+    Tabs.Map, Tabs.Containers, Tabs.Account,
 )

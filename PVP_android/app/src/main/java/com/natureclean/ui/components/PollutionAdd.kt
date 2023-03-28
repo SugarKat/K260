@@ -17,20 +17,100 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import com.natureclean.api.model.Container
 import com.natureclean.api.model.PollutionPoint
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> Unit){
+fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> Unit) {
 
-    var name by remember {mutableStateOf("")}
-    var description by remember {mutableStateOf("")}
-    var type by remember {mutableStateOf("")}
+    var name by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var type by remember { mutableStateOf("") }
 
+    AlertDialog(
+        title = {
+            Text(
+                text = "Register pollution point?",
+                color = Color.Black,
+                fontWeight = FontWeight(700),
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    placeholder = { Text("name") },
+                    label = { Text("name") },
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                TextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    placeholder = { Text("description") },
+                    label = { Text("description") },
+                    modifier = Modifier.padding(bottom = 8.dp)
+
+                )
+                TextField(
+                    value = type,
+                    onValueChange = {
+                        type = it
+                    },
+                    placeholder = { Text("type") },
+                    label = { Text("type") },
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+            }
+        },
+        onDismissRequest = {
+            closeDialog()
+        },
+        buttons = {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = {
+                        function(name, description, type)
+                    },
+                ) { Text("YES!") }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+        },
+        //Shape of the ALERT dialog
+        shape = RoundedCornerShape(10.dp),
+        //Disabling default alert dialog width
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        //Main modifier of the alert dialog box
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .wrapContentHeight()
+    )
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun PollutionClean(point: PollutionPoint, closeDialog: () -> Unit, onClick: () -> Unit = {}) {
+    var areyousure by remember { mutableStateOf(false) }
+
+    if (!areyousure) {
         AlertDialog(
             title = {
                 Text(
-                    text = "Register pollution point?",
+                    text = point.name,
                     color = Color.Black,
                     fontWeight = FontWeight(700),
                     fontSize = 18.sp,
@@ -43,30 +123,31 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    TextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        placeholder = { Text("name") },
-                        label = { Text("name") },
-                        modifier = Modifier.padding(bottom = 8.dp)
+                    Text(
+                        text = "ID: ${point.id}",
+                        color = Color.Black,
+                        fontWeight = FontWeight(700),
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    TextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        placeholder = { Text("description") },
-                        label = { Text("description") },
-                        modifier = Modifier.padding(bottom = 8.dp)
-
+                    Text(
+                        text = point.description ?: "No description",
+                        color = Color.Black,
+                        fontWeight = FontWeight(700),
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    TextField(
-                        value = type,
-                        onValueChange = {
-                            type = it },
-                        placeholder = { Text("type") },
-                        label = { Text("type") },
-                        modifier = Modifier.padding(bottom = 8.dp)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Rating ${point.rating}",
+                        color = Color.Black,
+                        fontWeight = FontWeight(700),
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
                     )
-
                 }
             },
             onDismissRequest = {
@@ -74,14 +155,79 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
             },
             buttons = {
                 Row(
-                    modifier = Modifier.padding(horizontal = 24.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
                         onClick = {
-                            function(name, description, type)
+                            areyousure = true
                         },
-                    ) { Text("YES!") }
+                    ) { Text("CLEANED?") }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+            },
+            //Shape of the ALERT dialog
+            shape = RoundedCornerShape(10.dp),
+            //Disabling default alert dialog width
+            properties = DialogProperties(usePlatformDefaultWidth = false),
+            //Main modifier of the alert dialog box
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .wrapContentHeight()
+        )
+    } else {
+        AlertDialog(
+            title = {
+                Text(
+                    text = "Are you sure",
+                    color = Color.Black,
+                    fontWeight = FontWeight(700),
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Are you sure this pollution point is cleaned?",
+                        color = Color.Black,
+                        fontWeight = FontWeight(700),
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            onDismissRequest = {
+                closeDialog()
+            },
+            buttons = {
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = {
+                            areyousure = false
+                            onClick()
+                        },
+                    ) { Text("YES") }
+                    Button(
+                        onClick = {
+                            areyousure = false
+                        },
+                    ) {
+                        Text("NO")
+                    }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
             },
@@ -96,3 +242,101 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
                 .wrapContentHeight()
         )
     }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
+
+    var name by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var type by remember { mutableStateOf("") }
+    var size by remember { mutableStateOf("") }
+
+    AlertDialog(
+        title = {
+            Text(
+                text = "Register Container?",
+                color = Color.Black,
+                fontWeight = FontWeight(700),
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    placeholder = { Text("name") },
+                    label = { Text("name") },
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                TextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    placeholder = { Text("description") },
+                    label = { Text("description") },
+                    modifier = Modifier.padding(bottom = 8.dp)
+
+                )
+                TextField(
+                    value = type,
+                    onValueChange = {
+                        type = it
+                    },
+                    placeholder = { Text("type") },
+                    label = { Text("type") },
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                TextField(
+                    value = size,
+                    onValueChange = { size = it },
+                    placeholder = { Text("size") },
+                    label = { Text("size") },
+                    modifier = Modifier.padding(bottom = 8.dp)
+
+                )
+
+            }
+        },
+        onDismissRequest = {
+            closeDialog()
+        },
+        buttons = {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = {
+                        register(
+                            Container(
+                                name = name,
+                                description = description,
+                                type = type,
+                                size = size
+                            )
+                        )
+                    },
+                ) { Text("YES!") }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+        },
+        //Shape of the ALERT dialog
+        shape = RoundedCornerShape(10.dp),
+        //Disabling default alert dialog width
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        //Main modifier of the alert dialog box
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .wrapContentHeight()
+    )
+}
