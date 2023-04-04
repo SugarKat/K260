@@ -85,6 +85,8 @@ fun Map(mainViewModel: MainViewModel) {
             }
         }
     }
+
+
     if (showDialog) {
         PollutionAdd(
             closeDialog = { mainViewModel.showDialogStatus(false) },

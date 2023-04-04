@@ -23,7 +23,6 @@ import com.natureclean.api.model.PollutionPoint
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> Unit) {
-
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var type by remember { mutableStateOf("") }
@@ -31,7 +30,7 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
     AlertDialog(
         title = {
             Text(
-                text = "Register pollution point?",
+                text = "Register pollution point?\n",
                 color = Color.Black,
                 fontWeight = FontWeight(700),
                 fontSize = 18.sp,
@@ -41,15 +40,18 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
         },
         text = {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+               // Text("")
                 TextField(
                     value = name,
                     onValueChange = { name = it },
                     placeholder = { Text("name") },
                     label = { Text("name") },
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
                 TextField(
                     value = description,
@@ -66,7 +68,6 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
                     },
                     placeholder = { Text("type") },
                     label = { Text("type") },
-                    modifier = Modifier.padding(bottom = 8.dp)
                 )
 
             }
@@ -89,11 +90,8 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
             }
             Spacer(modifier = Modifier.height(24.dp))
         },
-        //Shape of the ALERT dialog
         shape = RoundedCornerShape(10.dp),
-        //Disabling default alert dialog width
         properties = DialogProperties(usePlatformDefaultWidth = false),
-        //Main modifier of the alert dialog box
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
@@ -123,14 +121,6 @@ fun PollutionClean(point: PollutionPoint, closeDialog: () -> Unit, onClick: () -
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "ID: ${point.id}",
-                        color = Color.Black,
-                        fontWeight = FontWeight(700),
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
                     Text(
                         text = point.description ?: "No description",
                         color = Color.Black,
@@ -252,11 +242,14 @@ fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
     var description by remember { mutableStateOf("") }
     var type by remember { mutableStateOf("") }
     var size by remember { mutableStateOf("") }
+    var longitude by remember {mutableStateOf("0.0")}
+    var latitude by remember {mutableStateOf("0.0")}
+
 
     AlertDialog(
         title = {
             Text(
-                text = "Register Container?",
+                text = "Register Container?\n",
                 color = Color.Black,
                 fontWeight = FontWeight(700),
                 fontSize = 18.sp,
@@ -281,6 +274,22 @@ fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
                     onValueChange = { description = it },
                     placeholder = { Text("description") },
                     label = { Text("description") },
+                    modifier = Modifier.padding(bottom = 8.dp)
+
+                )
+                TextField(
+                    value = latitude,
+                    onValueChange = { latitude = it },
+                    placeholder = { Text("latitude") },
+                    label = { Text("latitude") },
+                    modifier = Modifier.padding(bottom = 8.dp)
+
+                )
+                TextField(
+                    value = longitude,
+                    onValueChange = { longitude = it },
+                    placeholder = { Text("longitude") },
+                    label = { Text("longitude") },
                     modifier = Modifier.padding(bottom = 8.dp)
 
                 )
@@ -321,7 +330,9 @@ fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
                                 name = name,
                                 description = description,
                                 type = type,
-                                size = size
+                                size = size,
+                                longitude = longitude.toDouble(),
+                                latitude = latitude.toDouble()
                             )
                         )
                     },
