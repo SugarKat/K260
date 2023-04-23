@@ -35,7 +35,7 @@ fun AppScaffold() {
         if (isTab(navBackStackEntry)) {
             MainTopAppBar(topTitle) {
                 mainViewModel.topBarAction(navController.currentDestination?.route)
-              mainViewModel.showDialogStatus(true)
+                mainViewModel.showDialogStatus(true)
             }
         }
     }
@@ -44,17 +44,8 @@ fun AppScaffold() {
             BottomNavigation(
                 modifier = Modifier.drawWithContent {
                     drawContent()
-
-                    val strokeWidth = 1f * density
-                    val y = strokeWidth / 2
-                    drawLine(
-                        Color.White,
-                        Offset(0f, y),
-                        Offset(size.width, y),
-                        strokeWidth
-                    )
                 },
-                backgroundColor = Color.Gray,
+                backgroundColor = Color.Gray.copy(0.95F),
                 elevation = 0.dp
             ) {
                 val currentRoute = navBackStackEntry?.destination?.route
@@ -63,7 +54,7 @@ fun AppScaffold() {
                     BottomNavigationItem(
                         icon = {
                             Icon(
-                                Icons.Rounded.Add,
+                                screen.icon,
                                 contentDescription = ""
                             )
                         },
@@ -76,8 +67,8 @@ fun AppScaffold() {
                                 letterSpacing = (-0.21).sp
                             )
                         },
-                        selectedContentColor = Color.White,
-                        unselectedContentColor = Color.Blue,
+                        selectedContentColor = Color.Green,
+                        unselectedContentColor = Color.White,
                         selected = currentRoute == screen.route,
                         onClick = {
                             topTitle = screen.title

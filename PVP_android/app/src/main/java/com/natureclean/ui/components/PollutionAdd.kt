@@ -45,7 +45,7 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
                     .padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-               // Text("")
+                // Text("")
                 TextField(
                     value = name,
                     onValueChange = { name = it },
@@ -84,7 +84,9 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
             ) {
                 Button(
                     onClick = {
-                        function(name, description, type)
+                        if (name.isNotEmpty() && description.isNotEmpty() && type.isNotEmpty()) {
+                            function(name, description, type)
+                        }
                     },
                 ) { Text("YES!") }
             }
@@ -242,8 +244,8 @@ fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
     var description by remember { mutableStateOf("") }
     var type by remember { mutableStateOf("") }
     var size by remember { mutableStateOf("") }
-    var longitude by remember {mutableStateOf("0.0")}
-    var latitude by remember {mutableStateOf("0.0")}
+    var longitude by remember { mutableStateOf("0.0") }
+    var latitude by remember { mutableStateOf("0.0") }
 
 
     AlertDialog(

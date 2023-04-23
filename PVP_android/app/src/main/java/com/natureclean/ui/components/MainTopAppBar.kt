@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun MainTopAppBar(title: String, addPoint: () -> Unit) {
     TopAppBar(
-        backgroundColor = Color.White,
+        backgroundColor = Color.Gray.copy(0.3F),
         elevation = 0.dp
     ) {
         Row(
@@ -29,7 +29,7 @@ fun MainTopAppBar(title: String, addPoint: () -> Unit) {
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = title,
-                color = Color.Blue,
+                color = Color.Black,
                 fontSize = 16.sp,
                 lineHeight = 20.sp,
                 fontWeight = FontWeight.Bold,

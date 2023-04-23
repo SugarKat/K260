@@ -27,8 +27,11 @@ class MainViewModel @Inject constructor(
 
     var user = mutableStateOf<User?>(null)
     var containers = mutableStateOf<List<Container>>(listOf())
+    var users = mutableStateOf<List<UserObj>>(listOf())
+
 
     var showDialog = mutableStateOf(false)
+
     fun topBarAction(route: String?){
         when(route){
             Tabs.Map.route ->{
@@ -36,7 +39,6 @@ class MainViewModel @Inject constructor(
             }
             Tabs.Containers.route ->{
                 showDialogStatus(true)
-
             }
             else ->{
 
@@ -187,6 +189,25 @@ class MainViewModel @Inject constructor(
                 )) {
                 is Resource.Success -> {
                     containers.value = response.data!!
+                }
+                is Resource.Error -> {
+                    errorMessage.value = response.error?.message ?: "Could not fetch"
+                }
+                else -> {}
+            }
+        }
+    }
+
+    fun getUsers(){
+        viewModelScope.launch {
+            when (val response =
+                api.getUsers()) {
+                is Resource.Success -> {
+                    response.data?.let{
+                        users.value = it.sortedBy { user->
+                            user.points
+                        }
+                    }
                 }
                 is Resource.Error -> {
                     errorMessage.value = response.error?.message ?: "Could not fetch"
