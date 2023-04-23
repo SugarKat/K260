@@ -88,6 +88,14 @@ class Backend @Inject constructor(
         return Resource.Success(response)
     }
 
-
+    suspend fun getUsers(): Resource<List<UserObj>>{
+        val response = try {
+            api.users()
+        } catch (e: Exception) {
+            Log.i("error", e.toString())
+            return Resource.Error(e.message ?: "Error")
+        }
+        return Resource.Success(response)
+    }
 
 }

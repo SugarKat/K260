@@ -44,5 +44,8 @@ interface BackendInterface {
     @GET("api/garbage-disposal-point")
     suspend fun getContainers(): List<Container>
 
+    @GET("api/user")
+    suspend fun users(): List<UserObj>
+
 
 }
