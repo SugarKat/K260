@@ -64,7 +64,6 @@ fun Map(mainViewModel: MainViewModel) {
     val currentPollutionPoint by remember { mainViewModel.currentPollutionPoint }
 
     var cleanDialog by remember { mutableStateOf(false) }
-    val showDialog by remember { mainViewModel.showDialog }
 
     val requestMultiplePermissions =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -87,20 +86,7 @@ fun Map(mainViewModel: MainViewModel) {
     }
 
 
-    if (showDialog) {
-        PollutionAdd(
-            closeDialog = { mainViewModel.showDialogStatus(false) },
-            function = { name, description, type ->
-                mainViewModel.registerPoint(
-                    name = name,
-                    description = description,
-                    type = type.toInt()
-                ) {
-                    mainViewModel.getPoints()
-                    mainViewModel.showDialogStatus(false)
-                }
-            })
-    }
+
     if (cleanDialog) {
         PollutionClean(
             point = currentPollutionPoint!!,//never null,

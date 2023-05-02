@@ -1,6 +1,7 @@
 package com.natureclean.navigation
 
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -20,22 +21,47 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.LatLng
 import com.natureclean.api.model.PollutionPoint
+import com.natureclean.ui.components.ContainerAdd
+import com.natureclean.ui.components.DARK_GREEN
 import com.natureclean.ui.components.MainTopAppBar
+import com.natureclean.ui.components.PollutionAdd
 import com.natureclean.viewmodels.MainViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AppScaffold() {
     val mainViewModel: MainViewModel = hiltViewModel()
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    var topTitle by remember { mutableStateOf(navController.currentDestination?.route ?: "Map") }
+    val coroutineScope = rememberCoroutineScope()
+
+    val addState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
+    val sheetState =
+        rememberBottomSheetScaffoldState(bottomSheetState = addState)
+
+    fun closeSheet() {
+        coroutineScope.launch {
+            addState.collapse()
+        }
+    }
+
+    fun openSheet() {
+        //modalSheetContent = modalContent
+        coroutineScope.launch {
+            addState.expand()
+        }
+    }
+
+    var topTitle by remember { mutableStateOf("Add point") }
 
     val topBar: @Composable () -> Unit = {
         if (isTab(navBackStackEntry)) {
             MainTopAppBar(topTitle) {
                 mainViewModel.topBarAction(navController.currentDestination?.route)
-                mainViewModel.showDialogStatus(true)
+                //mainViewModel.showDialogStatus(true)
+                openSheet()
             }
         }
     }
@@ -45,7 +71,7 @@ fun AppScaffold() {
                 modifier = Modifier.drawWithContent {
                     drawContent()
                 },
-                backgroundColor = Color.Gray.copy(0.95F),
+                backgroundColor = DARK_GREEN,
                 elevation = 0.dp
             ) {
                 val currentRoute = navBackStackEntry?.destination?.route
@@ -67,11 +93,11 @@ fun AppScaffold() {
                                 letterSpacing = (-0.21).sp
                             )
                         },
-                        selectedContentColor = Color.Green,
-                        unselectedContentColor = Color.White,
+                        selectedContentColor = Color.White,
+                        unselectedContentColor = Color(0xFFCCCCCC),
                         selected = currentRoute == screen.route,
                         onClick = {
-                            topTitle = screen.title
+                            topTitle = screen.actionTitle
                             navController.navigate(screen.route) {
                                 // Pop up to the start destination of the graph to
                                 // avoid building up a large stack of destinations
@@ -92,16 +118,45 @@ fun AppScaffold() {
         }
     }
 
-    Scaffold(
-        topBar = { topBar() },
-        bottomBar = { bottomBar() },
+    BottomSheetScaffold(
+        scaffoldState = sheetState,
+        sheetPeekHeight = 0.dp,
+        sheetContent = {
+            if (mainViewModel.showPollutionAdd.value) {
+                PollutionAdd(
+                    closeDialog = { closeSheet() },
+                    function = { name, description, type ->
+                        mainViewModel.registerPoint(
+                            name = name,
+                            description = description,
+                            type = type.toInt()
+                        ) {
+                            mainViewModel.getPoints()
+                        }
+                    })
+            } else {
+                ContainerAdd(closeDialog = { closeSheet() }, register = {
+                    mainViewModel.addContainer(it) {
+                        mainViewModel.getContainers()
+                    }
+                })
+            }
+
+        },
+        sheetShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
     ) {
-        Navigation(
-            navController = navController,
-            mainViewModel = mainViewModel,
-            insetsPadding = it
-        )
+        Scaffold(
+            topBar = { topBar() },
+            bottomBar = { bottomBar() },
+        ) {
+            Navigation(
+                navController = navController,
+                mainViewModel = mainViewModel,
+                insetsPadding = it
+            )
+        }
     }
+
 
 }
 

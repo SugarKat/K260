@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
@@ -26,7 +28,17 @@ import com.google.android.gms.maps.model.LatLng
 import com.natureclean.api.model.Container
 import com.natureclean.calculateDistance
 import com.natureclean.ui.components.ContainerAdd
+import com.natureclean.ui.components.DARK_GREEN
 import com.natureclean.viewmodels.MainViewModel
+
+
+val LIGHT_GREY = Color(0xFFdfe3dc)
+val containerList = listOf<Container>(
+    Container("asdasd", "adsad", 84.949, 84984.78, "asd", "asd"),
+    Container("asdasd", "adsad", 84.949, 84984.78, "asd", "asd"),
+    Container("asdasd", "adsad", 84.949, 84984.78, "asd", "asd"),
+    Container("asdasd", "adsad", 84.949, 84984.78, "asd", "asd"),
+)
 
 @Composable
 fun Containers(mainViewModel: MainViewModel) {
@@ -34,18 +46,9 @@ fun Containers(mainViewModel: MainViewModel) {
     val context = LocalContext.current
 
     val containers by remember { mainViewModel.containers }
-    val addContainer by remember { mainViewModel.showDialog }
     val userLocation by remember { mainViewModel.userLocation }
 
-
-    if (addContainer) {
-        ContainerAdd(closeDialog = { mainViewModel.showDialogStatus(false) }) {
-            mainViewModel.addContainer(it) {
-                mainViewModel.getContainers()
-                mainViewModel.showDialogStatus(false)
-            }
-        }
-    }
+    
     LaunchedEffect(Unit) {
         mainViewModel.getContainers()
     }
@@ -53,9 +56,9 @@ fun Containers(mainViewModel: MainViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Green.copy(0.3F))
+            .background(Color.White)
     ) {
-        if (containers.isEmpty()) {
+        if (containerList.isEmpty()) { //containerList
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -66,10 +69,11 @@ fun Containers(mainViewModel: MainViewModel) {
                 )
             }
         } else {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             LazyColumn() {
-                items(containers) { container ->
+                items(containerList) { container -> //containers
                     ContainerItem(context, container, userLocation!!)
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
@@ -88,33 +92,41 @@ fun ContainerItem(context: Context, container: Container, myDistance: LatLng?) {
         calculateDistance(myDistance!!,
             container.latitude?.let { container.longitude?.let { it1 -> LatLng(it, it1) } })
 
-
-    Column(
+    Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Blue.copy(0.1F))
+            .fillMaxSize()
+            .background(LIGHT_GREY)
             .padding(vertical = 4.dp, horizontal = 8.dp),
-        verticalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.Top,
+
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column() {
-                Text("Name: ${container.name}", modifier = Modifier.padding(vertical = 4.dp))
-                Text("Type: ${container.type}", modifier = Modifier.padding(vertical = 4.dp))
-                Text("Size: ${container.size}", modifier = Modifier.padding(vertical = 4.dp))
-                Button(onClick = {
+        Column {
+            Text("Name: ${container.name}", modifier = Modifier.padding(vertical = 4.dp))
+            Text("Type: ${container.type}", modifier = Modifier.padding(vertical = 4.dp))
+            Text("Size: ${container.size}", modifier = Modifier.padding(vertical = 4.dp))
+            Spacer(modifier = Modifier.height(4.dp))
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = DARK_GREEN
+                ),
+                onClick = {
                     ContextCompat.startActivity(context, mapIntent, null)
                 }) {
-                    Text(
-                        text = "Open in maps",
-                    )
-                }
-
+                Text(
+                    text = "Open in map".uppercase(),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
             }
-            Spacer(modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Column {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Distance from your location: ")
             Text(
-                text = if (container.latitude != null && container.longitude != null) "Distance: $distance km" else "Unknown distance",
+                text = if (container.latitude != null && container.longitude != null) "$distance km" else "Unknown distance",
                 fontSize = 14.sp,
-                fontWeight = FontWeight(600),
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .padding(vertical = 4.dp)
             )

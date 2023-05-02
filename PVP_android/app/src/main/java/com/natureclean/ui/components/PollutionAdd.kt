@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
@@ -20,92 +21,107 @@ import androidx.compose.ui.window.DialogProperties
 import com.natureclean.api.model.Container
 import com.natureclean.api.model.PollutionPoint
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> Unit) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var type by remember { mutableStateOf("") }
 
-    AlertDialog(
-        title = {
-            Text(
-                text = "Register pollution point?\n",
-                color = Color.Black,
-                fontWeight = FontWeight(700),
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        text = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Text("")
-                TextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    placeholder = { Text("name") },
-                    label = { Text("name") },
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-                TextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    placeholder = { Text("description") },
-                    label = { Text("description") },
-                    modifier = Modifier.padding(bottom = 8.dp)
-
-                )
-                TextField(
-                    value = type,
-                    onValueChange = {
-                        type = it
-                    },
-                    placeholder = { Text("type") },
-                    label = { Text("type") },
-                )
-
-            }
-        },
-        onDismissRequest = {
-            closeDialog()
-        },
-        buttons = {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
-                    onClick = {
-                        if (name.isNotEmpty() && description.isNotEmpty() && type.isNotEmpty()) {
-                            function(name, description, type)
-                        }
-                    },
-                ) { Text("YES!") }
-            }
-            Spacer(modifier = Modifier.height(24.dp))
-        },
-        shape = RoundedCornerShape(10.dp),
-        properties = DialogProperties(usePlatformDefaultWidth = false),
+    Column(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Register pollution point?".uppercase(),
+            color = Color.Black,
+            fontWeight = FontWeight(700),
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
+        )
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            placeholder = { Text("name") },
+            label = { Text("name") },
+            modifier = Modifier.padding(vertical = 16.dp)
+        )
+        TextField(
+            value = description,
+            onValueChange = { description = it },
+            placeholder = { Text("description") },
+            label = { Text("description") },
+            modifier = Modifier.padding(bottom = 16.dp)
+
+        )
+        TextField(
+            value = type,
+            onValueChange = {
+                type = it
+            },
+            placeholder = { Text("type") },
+            label = { Text("type") },
+            modifier = Modifier.padding(bottom = 16.dp)
+
+        )
+        Spacer(modifier = Modifier.height(64.dp))
+    }
+    Row(
+        modifier = Modifier
             .padding(horizontal = 24.dp)
-            .wrapContentHeight()
-    )
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceAround,
+    ) {
+        Button(
+            colors = ButtonDefaults.buttonColors(DARK_GREEN),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            modifier = Modifier
+                .weight(1f)
+                .requiredHeight(48.dp),
+            onClick = {
+                if (name.isNotEmpty() && description.isNotEmpty() && type.isNotEmpty()) {
+                    function(name, description, type)
+                }
+            },
+        ) {
+            Text(
+                text = "ADD".uppercase(),
+                fontSize = 22.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Spacer(modifier = Modifier.width(64.dp))
+        Button(
+            colors = ButtonDefaults.buttonColors(DARK_GREEN),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            modifier = Modifier
+                .weight(1f)
+                .requiredHeight(48.dp),
+            onClick = {
+                closeDialog()
+            },
+        ) {
+            Text(
+                text = "CANCEL".uppercase(),
+                fontSize = 22.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+    Spacer(modifier = Modifier.height(24.dp))
+
+
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+
 @Composable
 fun PollutionClean(point: PollutionPoint, closeDialog: () -> Unit, onClick: () -> Unit = {}) {
     var areyousure by remember { mutableStateOf(false) }
-
     if (!areyousure) {
         AlertDialog(
             title = {
@@ -236,7 +252,6 @@ fun PollutionClean(point: PollutionPoint, closeDialog: () -> Unit, onClick: () -
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
 
@@ -248,108 +263,127 @@ fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
     var latitude by remember { mutableStateOf("0.0") }
 
 
-    AlertDialog(
-        title = {
-            Text(
-                text = "Register Container?\n",
-                color = Color.Black,
-                fontWeight = FontWeight(700),
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        text = {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                TextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    placeholder = { Text("name") },
-                    label = { Text("name") },
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                TextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    placeholder = { Text("description") },
-                    label = { Text("description") },
-                    modifier = Modifier.padding(bottom = 8.dp)
-
-                )
-                TextField(
-                    value = latitude,
-                    onValueChange = { latitude = it },
-                    placeholder = { Text("latitude") },
-                    label = { Text("latitude") },
-                    modifier = Modifier.padding(bottom = 8.dp)
-
-                )
-                TextField(
-                    value = longitude,
-                    onValueChange = { longitude = it },
-                    placeholder = { Text("longitude") },
-                    label = { Text("longitude") },
-                    modifier = Modifier.padding(bottom = 8.dp)
-
-                )
-                TextField(
-                    value = type,
-                    onValueChange = {
-                        type = it
-                    },
-                    placeholder = { Text("type") },
-                    label = { Text("type") },
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                TextField(
-                    value = size,
-                    onValueChange = { size = it },
-                    placeholder = { Text("size") },
-                    label = { Text("size") },
-                    modifier = Modifier.padding(bottom = 8.dp)
-
-                )
-
-            }
-        },
-        onDismissRequest = {
-            closeDialog()
-        },
-        buttons = {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
-                    onClick = {
-                        register(
-                            Container(
-                                name = name,
-                                description = description,
-                                type = type,
-                                size = size,
-                                longitude = longitude.toDouble(),
-                                latitude = latitude.toDouble()
-                            )
-                        )
-                    },
-                ) { Text("YES!") }
-            }
-            Spacer(modifier = Modifier.height(24.dp))
-        },
-        //Shape of the ALERT dialog
-        shape = RoundedCornerShape(10.dp),
-        //Disabling default alert dialog width
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-        //Main modifier of the alert dialog box
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .wrapContentHeight()
-    )
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "ADD NEW BIN".uppercase(),
+            color = Color.Black,
+            fontWeight = FontWeight(700),
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
+        )
+
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            placeholder = { Text("name") },
+            label = { Text("name") },
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        TextField(
+            value = description,
+            onValueChange = { description = it },
+            placeholder = { Text("description") },
+            label = { Text("description") },
+            modifier = Modifier.padding(bottom = 16.dp)
+
+        )
+        TextField(
+            value = latitude,
+            onValueChange = { latitude = it },
+            placeholder = { Text("latitude") },
+            label = { Text("latitude") },
+            modifier = Modifier.padding(bottom = 16.dp)
+
+        )
+        TextField(
+            value = longitude,
+            onValueChange = { longitude = it },
+            placeholder = { Text("longitude") },
+            label = { Text("longitude") },
+            modifier = Modifier.padding(bottom = 16.dp)
+
+        )
+        TextField(
+            value = type,
+            onValueChange = {
+                type = it
+            },
+            placeholder = { Text("type") },
+            label = { Text("type") },
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        TextField(
+            value = size,
+            onValueChange = { size = it },
+            placeholder = { Text("size") },
+            label = { Text("size") },
+            modifier = Modifier.padding(bottom = 16.dp)
+
+        )
+        Spacer(modifier = Modifier.height(64.dp))
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround,
+        ) {
+            Button(
+                colors = ButtonDefaults.buttonColors(DARK_GREEN),
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .requiredHeight(48.dp),
+                onClick = {
+                    register(
+                        Container(
+                            name = name,
+                            description = description,
+                            type = type,
+                            size = size,
+                            longitude = longitude.toDouble(),
+                            latitude = latitude.toDouble()
+                        )
+                    )
+                },
+            ) {
+                Text(
+                    text = "ADD".uppercase(),
+                    fontSize = 22.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.width(64.dp))
+            Button(
+                colors = ButtonDefaults.buttonColors(DARK_GREEN),
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .requiredHeight(48.dp),
+                onClick = {
+                    closeDialog()
+                },
+            ) {
+                Text(
+                    text = "CANCEL".uppercase(),
+                    fontSize = 22.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+
+        //Shape of the ALERT dialog
+
+
+    }
 }
+

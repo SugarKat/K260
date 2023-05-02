@@ -7,6 +7,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Recycling
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,29 +17,52 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 
+val DARK_GREEN = Color(0xFF66b02c)
+
 @Composable
-fun MainTopAppBar(title: String, addPoint: () -> Unit) {
+fun MainTopAppBar(actionTitle: String, addPoint: () -> Unit) {
     TopAppBar(
-        backgroundColor = Color.Gray.copy(0.3F),
+        backgroundColor = DARK_GREEN,
         elevation = 0.dp
     ) {
         Row(
-            modifier= Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = title,
-                color = Color.Black,
-                fontSize = 16.sp,
+                text = "CITTLEA",
+                color = Color.White,
+                fontSize = 20.sp,
                 lineHeight = 20.sp,
                 fontWeight = FontWeight.Bold,
-
+                modifier = Modifier.padding(start = 16.dp, end = 2.dp)
+            )
+            Icon(
+                imageVector = Icons.Filled.Recycling,
+                "",
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.weight(1f))
-            Icon(imageVector = Icons.Default.Add, contentDescription = "", modifier = Modifier.padding(end = 16.dp).clickable {
-                addPoint()
-            })
+            if (actionTitle.isNotEmpty()) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .clickable {
+                            addPoint()
+                        })
+                Text(
+                    text = actionTitle.uppercase(),
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    lineHeight = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+            }
         }
     }
 }

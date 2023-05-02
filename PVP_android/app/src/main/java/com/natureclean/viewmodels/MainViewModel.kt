@@ -30,15 +30,19 @@ class MainViewModel @Inject constructor(
     var users = mutableStateOf<List<UserObj>>(listOf())
 
 
-    var showDialog = mutableStateOf(false)
+
+    var showPollutionAdd = mutableStateOf(false)
+    var showBinAdd = mutableStateOf(false)
 
     fun topBarAction(route: String?){
         when(route){
             Tabs.Map.route ->{
-                showDialogStatus(true)
+                showBinAdd.value = false
+                showPollutionAdd.value = true
             }
             Tabs.Containers.route ->{
-                showDialogStatus(true)
+                showPollutionAdd.value = false
+                showBinAdd.value = true
             }
             else ->{
 
@@ -53,9 +57,6 @@ class MainViewModel @Inject constructor(
         userLocation.value = newLoc
     }
 
-    fun showDialogStatus(status: Boolean) {
-        showDialog.value = status
-    }
 
     fun registerUser(userCreds: UserCredentials, callback: () -> Unit = {}) {
         viewModelScope.launch {

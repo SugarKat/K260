@@ -9,11 +9,11 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 
 
-sealed class Tabs(val route: String, val title: String, val icon: ImageVector) {
-    object Map: Tabs("map", "Map", icon = Icons.Filled.Map)
-    object Containers : Tabs("containers", "Containers", icon = Icons.Filled.List)
-    object Account : Tabs("account", "Account", icon = Icons.Filled.Person)
-    object Leaderboard: Tabs("leaderboard", "Leaderboard", icon = Icons.Filled.Leaderboard)
+sealed class Tabs(val route: String, val title: String, val actionTitle: String, val icon: ImageVector) {
+    object Map: Tabs("map", "Map", "Add Point", icon = Icons.Filled.Map)
+    object Containers : Tabs("containers", "Containers", "Add bin", icon = Icons.Filled.List)
+    object Account : Tabs("account", "Account", "", icon = Icons.Filled.Person)
+    object Leaderboard: Tabs("leaderboard", "Leaderboard","", icon = Icons.Filled.Leaderboard)
 }
 
 val bottomBarTabs = listOf(
