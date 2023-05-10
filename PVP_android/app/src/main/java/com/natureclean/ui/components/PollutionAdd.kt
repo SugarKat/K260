@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -18,8 +19,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import com.google.android.gms.maps.model.LatLng
 import com.natureclean.api.model.Container
 import com.natureclean.api.model.PollutionPoint
+import com.natureclean.calculateDistance
 
 @Composable
 fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> Unit) {
@@ -40,7 +43,9 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
             fontWeight = FontWeight(700),
             fontSize = 18.sp,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp)
         )
         TextField(
             value = name,
@@ -115,6 +120,62 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
     }
     Spacer(modifier = Modifier.height(24.dp))
 
+
+}
+
+@Composable
+fun PollutionInfo(
+    point: PollutionPoint,
+    myLocation: LatLng,
+    remove: () -> Unit,
+    clean: () -> Unit
+) {
+
+    val distance = calculateDistance(
+        myLocation,
+        point.latitude?.let { point.longitude?.let { it1 -> LatLng(it, it1) } })
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Litter info:",
+            color = Color.Black,
+            fontWeight = FontWeight(700),
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp)
+        )
+        Text("Name: ${point.name}")
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Description: ${point.description}")
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Litter type: ${point.type}")
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Report count: ${point.reportCount}")
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("$distance km")
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp), horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = { remove() }, colors = ButtonDefaults.buttonColors(Color.Red)) {
+                Text("Remove from hike")
+            }
+            Button(onClick = { clean() }, colors = ButtonDefaults.buttonColors(DARK_GREEN)) {
+                Text("Cleaned")
+            }
+        }
+    }
+    Spacer(modifier = Modifier.height(24.dp))
 
 }
 
@@ -276,7 +337,9 @@ fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
             fontWeight = FontWeight(700),
             fontSize = 18.sp,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp)
         )
 
         TextField(

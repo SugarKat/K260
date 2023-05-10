@@ -29,10 +29,25 @@ class MainViewModel @Inject constructor(
     var containers = mutableStateOf<List<Container>>(listOf())
     var users = mutableStateOf<List<UserObj>>(listOf())
 
-
-
     var showPollutionAdd = mutableStateOf(false)
     var showBinAdd = mutableStateOf(false)
+
+
+    var maxRange = mutableStateOf(Int.MAX_VALUE)
+    var pathPoints = mutableStateOf<List<PollutionPoint>>(listOf())
+
+
+    fun setMaxRange(value: Int){
+        maxRange.value = value
+    }
+
+    fun autoHikeMode(){
+        pathPoints.value = pollutionPoints.value
+    }
+    fun setPathCoordinates(coordinates: List<PollutionPoint>){
+
+        pathPoints.value = coordinates
+    }
 
     fun topBarAction(route: String?){
         when(route){
@@ -40,10 +55,10 @@ class MainViewModel @Inject constructor(
                 showBinAdd.value = false
                 showPollutionAdd.value = true
             }
-            Tabs.Containers.route ->{
-                showPollutionAdd.value = false
-                showBinAdd.value = true
-            }
+//            Tabs.Containers.route ->{
+//                showPollutionAdd.value = false
+//                showBinAdd.value = true
+//            }
             else ->{
 
             }

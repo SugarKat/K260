@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 val DARK_GREEN = Color(0xFF66b02c)
 
 @Composable
-fun MainTopAppBar(actionTitle: String, addPoint: () -> Unit) {
+fun MainTopAppBar(actionTitle: String = "", addPoint: () -> Unit= {}) {
     TopAppBar(
         backgroundColor = DARK_GREEN,
         elevation = 0.dp

@@ -1,5 +1,6 @@
 package com.natureclean.navigation.tabs
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,30 +24,24 @@ import com.natureclean.api.model.UserObj
 import com.natureclean.ui.components.DARK_GREEN
 import com.natureclean.viewmodels.MainViewModel
 
-val tempList = listOf<UserObj>(
-    UserObj(id = "", "adasd", "asdasd", "asdas", 150, "asdsad", "asdasd"),
-    UserObj(id = "", "adasd", "asdasd", "asdas", 150, "asdsad", "asdasd"),
-    UserObj(id = "", "adasd", "asdasd", "asdas", 150, "asdsad", "asdasd"),
-    UserObj(id = "", "adasd", "asdasd", "asdas", 150, "asdsad", "asdasd"),
-    UserObj(id = "", "adasd", "asdasd", "asdas", 150, "asdsad", "asdasd"),
-    UserObj(id = "", "adasd", "asdasd", "asdas", 150, "asdsad", "asdasd"),
-
-    )
-
 @Composable
 fun Leaderboard(mainViewModel: MainViewModel) {
     val users by remember { mainViewModel.users }
 
+
+    val sortedUsers = users.sortedBy { it.points }
+
     LaunchedEffect(Unit) {
         mainViewModel.getUsers()
     }
+
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        if (tempList.isEmpty()) { //users
+        if (users.isEmpty()) { //users
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -59,7 +54,9 @@ fun Leaderboard(mainViewModel: MainViewModel) {
         } else {
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn {
-                itemsIndexed(tempList) { index, user -> //users
+                itemsIndexed(users.sortedByDescending {
+                    it.points
+                }) { index, user -> //users
                     UserItem(user.name, user.points.toString(), (index + 1).toString())
                     Spacer(modifier = Modifier.height(4.dp))
                 }

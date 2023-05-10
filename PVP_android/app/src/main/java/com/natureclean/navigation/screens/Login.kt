@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.natureclean.api.model.UserCredentials
+import com.natureclean.navigation.Screen
 import com.natureclean.navigation.Tabs
 import com.natureclean.viewmodels.MainViewModel
 
@@ -72,6 +73,14 @@ fun Login(navController: NavController, mainViewModel: MainViewModel) {
 
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = {
+            navController.navigate(Screen.Register.route)
+        }
+        ) {
+            Text("Register")
+        }
+
         Spacer(modifier = Modifier.weight(1f))
     }
 }

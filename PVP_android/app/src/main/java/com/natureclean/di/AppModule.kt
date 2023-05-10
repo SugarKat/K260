@@ -3,6 +3,10 @@ package com.natureclean.di
 import android.content.Context
 import com.natureclean.api.Backend
 import com.natureclean.api.BackendInterface
+import com.natureclean.google.domain.repository.GooglePlacesInfoRepositoryImplementation
+import com.natureclean.google.domain.use_case.GetDirectionInfo
+import com.natureclean.google.remote.GooglePlacesInfoRepository
+import com.natureclean.google.remote.GooglePlacesApi
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -44,7 +48,7 @@ object AppModule {
             level = HttpLoggingInterceptor.Level.BODY
         })
 
-        client.authenticator{ _, response ->
+        client.authenticator { _, response ->
 
             response.request.newBuilder()
                 .header("Authorization", "Bearer 1|SxVCPC6PrHZtgH8eINh09Fb3F3KfbMPmZdK0IrMc")
@@ -63,10 +67,37 @@ object AppModule {
             )
             //http://10.0.2.2:8000/ //EMULATOR
             //http://192.168.0.101:8000
-            .baseUrl("http://192.168.0.104:8000")
+            .baseUrl("http://10.0.2.2:8000/")
             .build()
             .create(BackendInterface::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun provideGooglePlacesApi(): GooglePlacesApi {
+        return Retrofit.Builder()
+            .baseUrl(GooglePlacesApi.BASE_URL)
+            .addConverterFactory(
+                MoshiConverterFactory.create(
+                    Moshi.Builder()
+                        .addLast(KotlinJsonAdapterFactory()).build()
+
+                )
+            )
+            .build()
+            .create(GooglePlacesApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetDirectionInfo(repository: GooglePlacesInfoRepository): GetDirectionInfo {
+        return GetDirectionInfo(repository = repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDirectionInfoRepository(api: GooglePlacesApi): GooglePlacesInfoRepository {
+        return GooglePlacesInfoRepositoryImplementation(api = api)
+    }
 
 }

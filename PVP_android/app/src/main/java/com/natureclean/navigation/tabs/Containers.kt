@@ -33,103 +33,97 @@ import com.natureclean.viewmodels.MainViewModel
 
 
 val LIGHT_GREY = Color(0xFFdfe3dc)
-val containerList = listOf<Container>(
-    Container("asdasd", "adsad", 84.949, 84984.78, "asd", "asd"),
-    Container("asdasd", "adsad", 84.949, 84984.78, "asd", "asd"),
-    Container("asdasd", "adsad", 84.949, 84984.78, "asd", "asd"),
-    Container("asdasd", "adsad", 84.949, 84984.78, "asd", "asd"),
-)
 
-@Composable
-fun Containers(mainViewModel: MainViewModel) {
-
-    val context = LocalContext.current
-
-    val containers by remember { mainViewModel.containers }
-    val userLocation by remember { mainViewModel.userLocation }
-
-    
-    LaunchedEffect(Unit) {
-        mainViewModel.getContainers()
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        if (containerList.isEmpty()) { //containerList
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    "Currently no containers available, please add a container",
-                    textAlign = TextAlign.Center
-                )
-            }
-        } else {
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn() {
-                items(containerList) { container -> //containers
-                    ContainerItem(context, container, userLocation!!)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-
-fun ContainerItem(context: Context, container: Container, myDistance: LatLng?) {
-    val gmmIntentUri =
-        Uri.parse("http://maps.google.com/maps?q=loc:${container.latitude},${container.longitude}")
-    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-    mapIntent.setPackage("com.google.android.apps.maps")
-
-    val distance =
-        calculateDistance(myDistance!!,
-            container.latitude?.let { container.longitude?.let { it1 -> LatLng(it, it1) } })
-
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(LIGHT_GREY)
-            .padding(vertical = 4.dp, horizontal = 8.dp),
-        verticalAlignment = Alignment.Top,
-
-    ) {
-        Column {
-            Text("Name: ${container.name}", modifier = Modifier.padding(vertical = 4.dp))
-            Text("Type: ${container.type}", modifier = Modifier.padding(vertical = 4.dp))
-            Text("Size: ${container.size}", modifier = Modifier.padding(vertical = 4.dp))
-            Spacer(modifier = Modifier.height(4.dp))
-            Button(
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = DARK_GREEN
-                ),
-                onClick = {
-                    ContextCompat.startActivity(context, mapIntent, null)
-                }) {
-                Text(
-                    text = "Open in map".uppercase(),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        Column {
-            Spacer(modifier = Modifier.height(4.dp))
-            Text("Distance from your location: ")
-            Text(
-                text = if (container.latitude != null && container.longitude != null) "$distance km" else "Unknown distance",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .padding(vertical = 4.dp)
-            )
-        }
-    }
-}
+//@Composable
+//fun Containers(mainViewModel: MainViewModel) {
+//
+//    val context = LocalContext.current
+//
+//    val containers by remember { mainViewModel.containers }
+//    val userLocation by remember { mainViewModel.userLocation }
+//
+//
+//    LaunchedEffect(Unit) {
+//        mainViewModel.getContainers()
+//    }
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color.White)
+//    ) {
+//        if (containers.isEmpty()) { //containerList
+//            Column(
+//                verticalArrangement = Arrangement.Center,
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                Text(
+//                    "Currently no containers available, please add a container",
+//                    textAlign = TextAlign.Center
+//                )
+//            }
+//        } else {
+//            Spacer(modifier = Modifier.height(8.dp))
+//            LazyColumn() {
+//                items(containers) { container -> //containers
+//                    ContainerItem(context, container, userLocation!!)
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//@Composable
+//
+//fun ContainerItem(context: Context, container: Container, myDistance: LatLng?) {
+//    val gmmIntentUri =
+//        Uri.parse("http://maps.google.com/maps?q=loc:${container.latitude},${container.longitude}")
+//    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+//    mapIntent.setPackage("com.google.android.apps.maps")
+//
+//    val distance =
+//        calculateDistance(myDistance!!,
+//            container.latitude?.let { container.longitude?.let { it1 -> LatLng(it, it1) } })
+//
+//    Row(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(LIGHT_GREY)
+//            .padding(vertical = 4.dp, horizontal = 8.dp),
+//        verticalAlignment = Alignment.Top,
+//
+//    ) {
+//        Column {
+//            Text("Name: ${container.name}", modifier = Modifier.padding(vertical = 4.dp))
+//            Text("Type: ${container.type}", modifier = Modifier.padding(vertical = 4.dp))
+//            Text("Size: ${container.size}", modifier = Modifier.padding(vertical = 4.dp))
+//            Spacer(modifier = Modifier.height(4.dp))
+//            Button(
+//                colors = ButtonDefaults.buttonColors(
+//                    backgroundColor = DARK_GREEN
+//                ),
+//                onClick = {
+//                    ContextCompat.startActivity(context, mapIntent, null)
+//                }) {
+//                Text(
+//                    text = "Open in map".uppercase(),
+//                    color = Color.White,
+//                    fontWeight = FontWeight.Bold
+//                )
+//            }
+//        }
+//        Spacer(modifier = Modifier.weight(1f))
+//        Column {
+//            Spacer(modifier = Modifier.height(4.dp))
+//            Text("Distance from your location: ")
+//            Text(
+//                text = if (container.latitude != null && container.longitude != null) "$distance km" else "Unknown distance",
+//                fontSize = 14.sp,
+//                fontWeight = FontWeight.Bold,
+//                modifier = Modifier
+//                    .padding(vertical = 4.dp)
+//            )
+//        }
+//    }
+//}

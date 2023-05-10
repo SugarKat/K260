@@ -132,12 +132,14 @@ fun AppScaffold() {
                             type = type.toInt()
                         ) {
                             mainViewModel.getPoints()
+                            closeSheet()
                         }
                     })
             } else {
                 ContainerAdd(closeDialog = { closeSheet() }, register = {
                     mainViewModel.addContainer(it) {
                         mainViewModel.getContainers()
+                        closeSheet()
                     }
                 })
             }
