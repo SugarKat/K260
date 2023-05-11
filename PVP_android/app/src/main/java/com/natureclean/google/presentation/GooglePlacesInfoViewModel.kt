@@ -1,82 +1,80 @@
 package com.natureclean.google.presentation
 
-import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.natureclean.api.google.GoogleBackend
 import com.natureclean.api.model.Resource
-import com.natureclean.google.domain.use_case.GetDirectionInfo
+import com.natureclean.formatGoogleWaypoints
+import com.natureclean.google.domain.model.GeocodedWaypoints
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 const val MAP_KEY = "AIzaSyBNKkzRI4t5K3C9upmPNaAZ8OYN6VNjZT0"
+
 @HiltViewModel
-class GooglePlacesInfoViewModel @Inject constructor(private val getDirectionInfo: GetDirectionInfo): ViewModel() {
+class GooglePlacesInfoViewModel @Inject constructor(private val googleApi: GoogleBackend) :
+    ViewModel() {
 
     private val _googlePlacesInfoState = mutableStateOf(GooglePlacesInfoState())
     val googlePlacesInfoState: State<GooglePlacesInfoState> = _googlePlacesInfoState
 
-//    private var _polyLinesPoints = MutableSharedFlow<List<LatLng>>()
-//    val polyLinesPoints = _polyLinesPoints.asSharedFlow()
 
-    private val _polyLinesPoints = MutableStateFlow<List<LatLng>>(emptyList())
-    val polyLinesPoints: StateFlow<List<LatLng>>
-        get() = _polyLinesPoints
-
-    private val _eventFlow = MutableSharedFlow<UIEvent>()
-    val evenFlow = _eventFlow.asSharedFlow()
-
-    fun getDirection(origin: String, destination: String, key: String){
+    val polylines = mutableStateOf<List<LatLng>>(emptyList())
+    fun getDirection(
+        origin: String,
+        destination: String,
+        waypoints: List<LatLng>?,
+        mode: String = "walking"
+    ) {
+        Log.e("my points", waypoints.toString())
         viewModelScope.launch {
-            getDirectionInfo(origin = origin, destination = destination, key = key).onEach { res ->
-                when(res){
-                    is Resource.Success ->{
-                        _googlePlacesInfoState.value = googlePlacesInfoState.value.copy(
-                            direction = res.data,
-                            isLoading = false
+            when (val response =
+                googleApi.getDirections(
+                    destination = destination,
+                    origin = origin,
+                    waypoints = waypoints?.formatGoogleWaypoints(),
+                    mode = mode,
+                )) {
+                is Resource.Success -> {
+                    _googlePlacesInfoState.value = googlePlacesInfoState.value.copy(
+                        direction = response.data,
+                        isLoading = false
+                    )
+                    googlePlacesInfoState.value.direction?.routes?.get(0)?.overview_polyline?.points?.let {
+                        decoPoints(
+                            points = it
                         )
-                        _eventFlow.emit(UIEvent.ShowSnackBar(message = "Direction Loaded"))
-//                        _eventFlow.emit(
-//                            UIEvent.ShowSnackBar(
-//                            message = googlePlacesInfoState.value.direction?.routes?.get(0)?.overview_polyline?.points.toString()
-//                            )
-//                        )
-                        googlePlacesInfoState.value.direction?.routes?.get(0)?.overview_polyline?.points?.let { decoPoints(points = it) }
-                        Log.e("POLYLIN",  googlePlacesInfoState.value.direction?.routes?.get(0)?.overview_polyline?.points.toString())
                     }
-                    is Resource.Error -> {
-                        _eventFlow.emit(UIEvent.ShowSnackBar(message = res.message?:"Unknown Error"))
-                    }
-                    is Resource.Loading -> {
-                        _googlePlacesInfoState.value = googlePlacesInfoState.value.copy(
-                            direction = null,
-                            isLoading = false
-                        )
-                        _eventFlow.emit(UIEvent.ShowSnackBar(message = "Loading Direction"))
-                    }
+                    Log.i("response suc", response.data.toString())
+
                 }
-            }.launchIn(this)
+
+                is Resource.Error -> {
+                    Log.i("response e", response.toString())
+
+                }
+
+                else -> {
+                    Log.i("response else", response.toString())
+
+                }
+            }
         }
     }
 
-    sealed class UIEvent{
-        data class ShowSnackBar(val message: String): UIEvent()
-    }
-
-    private fun decoPoints(points: String): List<LatLng>{
-        _polyLinesPoints.value = decodePoly(points)
-        return decodePoly(points);
+    private fun decoPoints(points: String) {
+        polylines.value = decodePoly(points)
     }
 
     /**
@@ -112,8 +110,10 @@ class GooglePlacesInfoViewModel @Inject constructor(private val getDirectionInfo
             val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
             lng += dlng
 
-            val p = LatLng(lat.toDouble() / 1E5,
-                lng.toDouble() / 1E5)
+            val p = LatLng(
+                lat.toDouble() / 1E5,
+                lng.toDouble() / 1E5
+            )
             poly.add(p)
         }
 

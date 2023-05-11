@@ -141,3 +141,19 @@ fun LatLng.distanceTo(other: LatLng): Double {
 
     return EARTH_RADIUS * c
 }
+
+fun List<LatLng>.formatGoogleWaypoints(): String {
+    if (this.isEmpty()) {
+        return ""
+    }
+
+    val sb = StringBuilder()
+
+    for (waypoint in this) {
+        sb.append("via:${waypoint.latitude},${waypoint.longitude}|")
+    }
+
+    sb.deleteCharAt(sb.length - 1) // Remove the last '|' character
+
+    return sb.toString()
+}

@@ -3,10 +3,8 @@ package com.natureclean.di
 import android.content.Context
 import com.natureclean.api.Backend
 import com.natureclean.api.BackendInterface
-import com.natureclean.google.domain.repository.GooglePlacesInfoRepositoryImplementation
-import com.natureclean.google.domain.use_case.GetDirectionInfo
-import com.natureclean.google.remote.GooglePlacesInfoRepository
-import com.natureclean.google.remote.GooglePlacesApi
+import com.natureclean.api.google.GoogleBackend
+import com.natureclean.api.google.GoogleBackendInterface
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -72,32 +70,41 @@ object AppModule {
             .create(BackendInterface::class.java)
     }
 
+    @Singleton
+    @Provides
+    fun provideGoogleBackend(
+        api: GoogleBackendInterface
+    ) = GoogleBackend(api)
+
+
     @Provides
     @Singleton
-    fun provideGooglePlacesApi(): GooglePlacesApi {
+    fun provideGoogleBackendInterface(): GoogleBackendInterface {
+
+        val client = OkHttpClient.Builder()
+
+        client.addInterceptor {
+            val request = it.request()
+            val builder = request.newBuilder()
+            val url = request.url.newBuilder()
+            it.proceed(builder.addHeader("Accept", "application/json").url(url.build()).build())
+        }
+
+        client.addInterceptor(HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        })
+
         return Retrofit.Builder()
-            .baseUrl(GooglePlacesApi.BASE_URL)
+            .client(client.build())
+            .baseUrl(GoogleBackendInterface.BASE_URL)
             .addConverterFactory(
                 MoshiConverterFactory.create(
                     Moshi.Builder()
                         .addLast(KotlinJsonAdapterFactory()).build()
-
                 )
             )
             .build()
-            .create(GooglePlacesApi::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideGetDirectionInfo(repository: GooglePlacesInfoRepository): GetDirectionInfo {
-        return GetDirectionInfo(repository = repository)
-    }
-
-    @Provides
-    @Singleton
-    fun provideDirectionInfoRepository(api: GooglePlacesApi): GooglePlacesInfoRepository {
-        return GooglePlacesInfoRepositoryImplementation(api = api)
+            .create(GoogleBackendInterface::class.java)
     }
 
 }
