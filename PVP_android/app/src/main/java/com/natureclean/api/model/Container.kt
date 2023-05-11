@@ -5,6 +5,6 @@ data class Container(
     val description: String,
     val longitude: Double? = 0.0,
     val latitude: Double? = 0.0,
-    val type: String,
-    val size: String
+    val type: Int,
+    val size: Int
 )

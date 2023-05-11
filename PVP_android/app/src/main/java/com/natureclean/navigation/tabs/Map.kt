@@ -7,18 +7,32 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.location.Location
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.filled.DirectionsRun
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -35,16 +49,22 @@ import com.google.maps.android.compose.*
 import com.natureclean.R
 import com.natureclean.api.model.PollutionPoint
 import com.natureclean.checkMapPermissions
+import com.natureclean.toBinSize
+import com.natureclean.toBinType
 import com.natureclean.ui.components.PollutionAdd
 import com.natureclean.ui.components.PollutionClean
 import com.natureclean.viewmodels.MainViewModel
+import kotlinx.coroutines.launch
+import java.util.Timer
+import java.util.TimerTask
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @SuppressLint("MissingPermission")
 @Composable
 fun Map(mainViewModel: MainViewModel) {
     val context = LocalContext.current
-    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    val coroutineScope = rememberCoroutineScope()
 
     var myLocationEnabled by remember { mutableStateOf(false) } //permissions granted
 
@@ -58,14 +78,37 @@ fun Map(mainViewModel: MainViewModel) {
         )
     }
 
-
-    fusedLocationClient.lastLocation
-        .addOnSuccessListener { location: Location? ->
-            if (location != null) {
-                Log.e("location", location.latitude.toString())
-                mainViewModel.updateLocation(LatLng(location.latitude, location.longitude))
-            }
+    fun openSheet() {
+        //modalSheetContent = modalContent
+        coroutineScope.launch {
+            mainViewModel.globalSheetState?.bottomSheetState?.expand()
         }
+    }
+
+    val timer = remember { Timer() }
+
+    val fusedLocationClient =
+        LocationServices.getFusedLocationProviderClient(
+            context
+        )
+
+    timer.schedule(object : TimerTask() {
+        override fun run() {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    if (location != null) {
+                        Log.e("location", location.latitude.toString())
+                        mainViewModel.updateLocation(LatLng(location.latitude, location.longitude))
+                    }
+                }
+        }
+    }, 0, 60 * 1000)
+
+    DisposableEffect(Unit) {
+        onDispose {
+            timer.cancel()
+        }
+    }
 
 
     val pollutionPoints = remember { mainViewModel.pollutionPoints }
@@ -84,6 +127,7 @@ fun Map(mainViewModel: MainViewModel) {
         }
 
     LaunchedEffect(Unit) {
+
         mainViewModel.getContainers()
         mainViewModel.getPoints()
         checkMapPermissions(context).apply {
@@ -109,56 +153,76 @@ fun Map(mainViewModel: MainViewModel) {
             }
         )
     }
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState,
-        properties = MapProperties(isMyLocationEnabled = myLocationEnabled),
-        uiSettings = uiSettings,
-    ) {
+    Box {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(isMyLocationEnabled = myLocationEnabled),
+            uiSettings = uiSettings,
+        ) {
 
-        pollutionPoints.value.forEach { point ->
-            if (point.latitude != null && point.longitude != null && point.isActive == 1) {
-                Marker(
-                    state = MarkerState(
-                        position = LatLng(
-                            point.latitude,
-                            point.longitude
-                        )
-                    ),
-                    icon = bitmapDescriptorFromVector(context, R.drawable.litter_map),
-                    onClick = {
-                        mainViewModel.setPollutionPoint(point)
-                        cleanDialog = true
-                        true
-                    },
-                    anchor = Offset(0.5F, 0.5F)
-                )
+            pollutionPoints.value.forEach { point ->
+                if (point.latitude != null && point.longitude != null && point.isActive == 1) {
+                    Marker(
+                        state = MarkerState(
+                            position = LatLng(
+                                point.latitude,
+                                point.longitude
+                            )
+                        ),
+                        icon = bitmapDescriptorFromVector(context, R.drawable.litter_map),
+                        onClick = {
+                            mainViewModel.setPollutionPoint(point)
+                            cleanDialog = true
+                            true
+                        },
+                        anchor = Offset(0.5F, 0.5F)
+                    )
+                }
             }
-        }
-        containers.value.forEach { container ->
-            if (container.latitude != null && container.longitude != null) {
-                MarkerInfoWindow(
-                    icon = bitmapDescriptorFromVector(context, R.drawable.container_map),
-                    state = MarkerState(
-                        position = LatLng(
-                            container.latitude,
-                            container.longitude
-                        )
-                    ),
-                    anchor = Offset(0.5F, 0.5F),
-                    content = {
-                        Column(
-                            modifier = Modifier.padding(16.dp).background(Color.White),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(container.name)
-                            Text(container.size)
-                            Text(container.type)
+            containers.value.forEach { container ->
+                if (container.latitude != null && container.longitude != null) {
+                    MarkerInfoWindow(
+                        icon = bitmapDescriptorFromVector(context, R.drawable.container_map),
+                        state = MarkerState(
+                            position = LatLng(
+                                container.latitude,
+                                container.longitude
+                            )
+                        ),
+                        anchor = Offset(0.5F, 0.5F),
+                        content = {
+                            Column(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .background(Color.White),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(container.name)
+                                Text(container.size.toBinSize())
+                                Text(container.type.toBinType())
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
+        androidx.compose.material3.Icon(
+            imageVector = Icons.Filled.Delete,
+            contentDescription = "",
+            modifier = Modifier
+                .padding(start = 12.dp, top = 12.dp)
+                .align(Alignment.TopStart)
+                .background(Color.White, shape = CircleShape)
+                .clip(CircleShape)
+                .clickable {
+                    mainViewModel.showBinAdd()
+                    coroutineScope.launch {
+                        openSheet()
+                    }
+                }
+                .padding(8.dp)
+        )
     }
 }
 
@@ -180,12 +244,3 @@ fun bitmapDescriptorFromVector(context: Context, vectorResId: Int): BitmapDescri
     vectorDrawable.draw(canvas)
     return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
-
-//Marker(
-//state = MarkerState(it),
-//icon = bitmapDescriptorFromVector(
-//context,
-//if (index != activeIndex) R.drawable.red_marker else R.drawable.ic_red_active_marker
-//),
-//anchor = Offset(0.5F, 0.5F)
-//)

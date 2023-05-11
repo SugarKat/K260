@@ -49,7 +49,7 @@ object AppModule {
         client.authenticator { _, response ->
 
             response.request.newBuilder()
-                .header("Authorization", "Bearer 1|SxVCPC6PrHZtgH8eINh09Fb3F3KfbMPmZdK0IrMc")
+                .header("Authorization", "Bearer 2|DUcRI6KxQHaxZZSaLuZQmeCmN0uocrWxbXlKd4hJ")
                 .build()
 
         }

@@ -1,6 +1,8 @@
 package com.natureclean.viewmodels
 
 import android.util.Log
+import androidx.compose.material.BottomSheetScaffoldState
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -13,6 +15,31 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+val typeBinValues = mutableMapOf(
+    1 to "Plastikui",
+    2 to "Popieriui",
+    3 to "Stiklui",
+    4 to "Mišriom atliekom"
+)
+val sizeBinValues = mutableMapOf(
+    1 to "Maža šiukšliadėžė",
+    2 to "Vidutinė šiukšliadėžė",
+    3 to "Didelė šiukšliadėžė"
+)
+
+val typePollutionValues = mutableMapOf(
+    1 to "Plastikas",
+    2 to "Popierius",
+    3 to "Stiklas",
+    4 to "Stambiagabaritės",
+    5 to "Mišrios"
+)
+val sizePollutionValues = mutableMapOf(
+    1 to "Mažas užterštumas",
+    2 to "Didelis užterštumas",
+    3 to "Labi didelis užterštumas",
+)
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -36,6 +63,14 @@ class MainViewModel @Inject constructor(
     var maxRange = mutableStateOf(Int.MAX_VALUE)
     var pathPoints = mutableStateOf<List<PollutionPoint>>(listOf())
 
+    @OptIn(ExperimentalMaterialApi::class)
+    var globalSheetState: BottomSheetScaffoldState? = null
+
+    @OptIn(ExperimentalMaterialApi::class)
+    fun setSheetState(sheetState: BottomSheetScaffoldState){
+        globalSheetState = sheetState
+    }
+
 
     fun setMaxRange(value: Int){
         maxRange.value = value
@@ -51,18 +86,28 @@ class MainViewModel @Inject constructor(
 
     fun topBarAction(route: String?){
         when(route){
-            Tabs.Map.route ->{
-                showBinAdd.value = false
-                showPollutionAdd.value = true
-            }
-//            Tabs.Containers.route ->{
-//                showPollutionAdd.value = false
-//                showBinAdd.value = true
+//            Tabs.Map.route ->{
+//                showBinAdd.value = false
+//                showPollutionAdd.value = true
 //            }
-            else ->{
-
-            }
+////            Tabs.Containers.route ->{
+////                showPollutionAdd.value = false
+////                showBinAdd.value = true
+////            }
+//            else ->{
+//
+//            }
         }
+    }
+
+
+    fun showPointAdd(){
+        showBinAdd.value = false
+        showPollutionAdd.value = true
+    }
+    fun showBinAdd(){
+        showPollutionAdd.value = false
+        showBinAdd.value = true
     }
 
     fun setPollutionPoint(point: PollutionPoint){
@@ -134,7 +179,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun registerPoint(name: String, description: String, type: Int, callback: () -> Unit) {
+    fun registerPoint(name: String, description: String, type: Int, size: Int, callback: () -> Unit) {
         Log.e("IN FUNC", "IN FUNC")
         viewModelScope.launch {
             when (val response =
@@ -144,7 +189,7 @@ class MainViewModel @Inject constructor(
                         description = description,
                         longitude = userLocation.value?.longitude,
                         latitude = userLocation.value?.latitude,
-                        rating = 1,
+                        rating = size,
                         type = type
                     )
                 )) {

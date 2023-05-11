@@ -1,6 +1,8 @@
 package com.natureclean.google.presentation
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -32,6 +34,7 @@ class GooglePlacesInfoViewModel @Inject constructor(private val googleApi: Googl
 
     val polylines = mutableStateOf<List<LatLng>>(emptyList())
     fun getDirection(
+        context: Context? = null,
         origin: String,
         destination: String,
         waypoints: List<LatLng>?,
@@ -62,6 +65,7 @@ class GooglePlacesInfoViewModel @Inject constructor(private val googleApi: Googl
 
                 is Resource.Error -> {
                     Log.i("response e", response.toString())
+                    Toast.makeText(context, "No better path is available", Toast.LENGTH_LONG).show()
 
                 }
 

@@ -1,19 +1,24 @@
 package com.natureclean.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,12 +28,20 @@ import com.google.android.gms.maps.model.LatLng
 import com.natureclean.api.model.Container
 import com.natureclean.api.model.PollutionPoint
 import com.natureclean.calculateDistance
+import com.natureclean.toWasteType
+import com.natureclean.viewmodels.sizeBinValues
+import com.natureclean.viewmodels.sizePollutionValues
+import com.natureclean.viewmodels.typeBinValues
+import com.natureclean.viewmodels.typePollutionValues
 
 @Composable
-fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> Unit) {
+fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, Int, Int) -> Unit) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var type by remember { mutableStateOf("") }
+
+    var type by remember { mutableStateOf(1) }
+    var size by remember { mutableStateOf(1) }
+
 
     Column(
         modifier = Modifier
@@ -60,18 +73,14 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
             placeholder = { Text("description") },
             label = { Text("description") },
             modifier = Modifier.padding(bottom = 16.dp)
-
         )
-        TextField(
-            value = type,
-            onValueChange = {
-                type = it
-            },
-            placeholder = { Text("type") },
-            label = { Text("type") },
-            modifier = Modifier.padding(bottom = 16.dp)
-
-        )
+        DropDownMenu(typePollutionValues) {
+            type = it
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        DropDownMenu(sizePollutionValues) {
+            size = it
+        }
         Spacer(modifier = Modifier.height(64.dp))
     }
     Row(
@@ -87,8 +96,8 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, String) -> 
                 .weight(1f)
                 .requiredHeight(48.dp),
             onClick = {
-                if (name.isNotEmpty() && description.isNotEmpty() && type.isNotEmpty()) {
-                    function(name, description, type)
+                if (name.isNotEmpty() && description.isNotEmpty()) {
+                    function(name, description, type, size)
                 }
             },
         ) {
@@ -156,7 +165,7 @@ fun PollutionInfo(
         Spacer(modifier = Modifier.height(16.dp))
         Text("Description: ${point.description}")
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Litter type: ${point.type}")
+        Text("Litter type: ${point.type.toWasteType()}")
         Spacer(modifier = Modifier.height(16.dp))
         Text("Report count: ${point.reportCount}")
         Spacer(modifier = Modifier.height(16.dp))
@@ -210,7 +219,7 @@ fun PollutionClean(point: PollutionPoint, closeDialog: () -> Unit, onClick: () -
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Rating ${point.rating}",
+                        text = "Type: ${point.type.toWasteType()}",
                         color = Color.Black,
                         fontWeight = FontWeight(700),
                         fontSize = 18.sp,
@@ -314,14 +323,13 @@ fun PollutionClean(point: PollutionPoint, closeDialog: () -> Unit, onClick: () -
 }
 
 @Composable
-fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
+fun ContainerAdd(closeDialog: () -> Unit, userLocation: LatLng, register: (Container) -> Unit) {
 
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var type by remember { mutableStateOf("") }
-    var size by remember { mutableStateOf("") }
-    var longitude by remember { mutableStateOf("0.0") }
-    var latitude by remember { mutableStateOf("0.0") }
+
+    var type by remember { mutableStateOf(1) }
+    var size by remember { mutableStateOf(1) }
 
 
     Column(
@@ -357,39 +365,13 @@ fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
             modifier = Modifier.padding(bottom = 16.dp)
 
         )
-        TextField(
-            value = latitude,
-            onValueChange = { latitude = it },
-            placeholder = { Text("latitude") },
-            label = { Text("latitude") },
-            modifier = Modifier.padding(bottom = 16.dp)
-
-        )
-        TextField(
-            value = longitude,
-            onValueChange = { longitude = it },
-            placeholder = { Text("longitude") },
-            label = { Text("longitude") },
-            modifier = Modifier.padding(bottom = 16.dp)
-
-        )
-        TextField(
-            value = type,
-            onValueChange = {
-                type = it
-            },
-            placeholder = { Text("type") },
-            label = { Text("type") },
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        TextField(
-            value = size,
-            onValueChange = { size = it },
-            placeholder = { Text("size") },
-            label = { Text("size") },
-            modifier = Modifier.padding(bottom = 16.dp)
-
-        )
+        DropDownMenu(typeBinValues) {
+            type = it
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        DropDownMenu(sizeBinValues) {
+            size = it
+        }
         Spacer(modifier = Modifier.height(64.dp))
         Row(
             modifier = Modifier
@@ -410,8 +392,8 @@ fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
                             description = description,
                             type = type,
                             size = size,
-                            longitude = longitude.toDouble(),
-                            latitude = latitude.toDouble()
+                            longitude = userLocation.longitude,
+                            latitude = userLocation.latitude
                         )
                     )
                 },
@@ -450,3 +432,51 @@ fun ContainerAdd(closeDialog: () -> Unit, register: (Container) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@Composable
+fun DropDownMenu(values: Map<Int, String>, onChosen: (Int) -> Unit) {
+    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+
+    var selectedText by remember { mutableStateOf(values.values.first()) }
+    var selectedKey by remember { mutableStateOf(0) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            androidx.compose.material3.TextField(
+                value = selectedText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+
+                )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                values.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item.value) },
+                        onClick = {
+                            selectedText = item.value
+                            selectedKey = item.key
+                            expanded = false
+                            Toast.makeText(context, item.value, Toast.LENGTH_SHORT).show()
+                            onChosen(selectedKey)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}

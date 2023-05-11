@@ -3,12 +3,12 @@ package com.natureclean
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
-import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.LatLng
-import java.util.PriorityQueue
-import java.util.Queue
+import com.natureclean.viewmodels.sizeBinValues
+import com.natureclean.viewmodels.sizePollutionValues
+import com.natureclean.viewmodels.typeBinValues
+import com.natureclean.viewmodels.typePollutionValues
 import kotlin.math.*
 
 
@@ -157,3 +157,20 @@ fun List<LatLng>.formatGoogleWaypoints(): String {
 
     return sb.toString()
 }
+
+fun Int.convertTypeToString(){
+
+}
+fun Int.toWasteType(): String {
+    return typePollutionValues.getOrDefault(this, "Nenurodyta")
+}
+fun Int.toWasteSize(): String {
+    return sizePollutionValues.getOrDefault(this, "Nenurodyta")
+}
+fun Int.toBinType(): String{
+    return typeBinValues.getOrDefault(this, "Nenurodyta")
+}
+fun Int.toBinSize(): String{
+    return sizeBinValues.getOrDefault(this, "Nenurodyta")
+}
+

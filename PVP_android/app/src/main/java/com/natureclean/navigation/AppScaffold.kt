@@ -53,14 +53,16 @@ fun AppScaffold() {
             addState.expand()
         }
     }
+    LaunchedEffect(key1 = Unit) {
+        mainViewModel.setSheetState(sheetState = sheetState)
+    }
 
     var topTitle by remember { mutableStateOf("Add point") }
 
     val topBar: @Composable () -> Unit = {
         if (isTab(navBackStackEntry)) {
             MainTopAppBar(topTitle) {
-                mainViewModel.topBarAction(navController.currentDestination?.route)
-                //mainViewModel.showDialogStatus(true)
+                mainViewModel.showPointAdd()
                 openSheet()
             }
         }
@@ -125,23 +127,27 @@ fun AppScaffold() {
             if (mainViewModel.showPollutionAdd.value) {
                 PollutionAdd(
                     closeDialog = { closeSheet() },
-                    function = { name, description, type ->
+                    function = { name, description, type, size ->
                         mainViewModel.registerPoint(
                             name = name,
                             description = description,
-                            type = type.toInt()
+                            type = type,
+                            size = size
                         ) {
                             mainViewModel.getPoints()
                             closeSheet()
                         }
                     })
             } else {
-                ContainerAdd(closeDialog = { closeSheet() }, register = {
-                    mainViewModel.addContainer(it) {
-                        mainViewModel.getContainers()
-                        closeSheet()
-                    }
-                })
+                ContainerAdd(
+                    closeDialog = { closeSheet() },
+                    userLocation = mainViewModel.userLocation.value ?: LatLng(0.0, 0.0),
+                    register = {
+                        mainViewModel.addContainer(it) {
+                            mainViewModel.getContainers()
+                            closeSheet()
+                        }
+                    })
             }
 
         },
