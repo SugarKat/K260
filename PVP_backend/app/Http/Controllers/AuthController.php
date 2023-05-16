@@ -18,5 +18,17 @@ class AuthController extends Controller{
             'email' => $fields['email'],
             'password' => bcrypt($fields['password'])
         ]);
+<<<<<<< Updated upstream
+=======
+        $user->assignRole('user');
+        $token = $user->createToken('myapptoken')->plainTextToken;
+
+        $response = [
+            'user' => $user,
+            'token' => $token
+        ];
+
+        return response($response, 201);
+>>>>>>> Stashed changes
     }
 }
