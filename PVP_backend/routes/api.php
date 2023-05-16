@@ -37,3 +37,7 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::resource('garbage-disposal-point', GarbageDisposalPointController::class);
 });
 
+Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function() {
+    Route::get('admin-panel', [UserController::class, 'index']);
+});
+
