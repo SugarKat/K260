@@ -22,10 +22,12 @@ class AuthController extends Controller{
         ]);
         $user->assignRole('user');
         $token = $user->createToken('myapptoken')->plainTextToken;
+	    $roles = $user->getRoleNames();
 
         $response = [
             'user' => $user,
-            'token' => $token
+            'token' => $token,
+	    'roles' => $roles
         ];
 
         return response($response, 201);
