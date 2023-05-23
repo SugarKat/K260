@@ -62,16 +62,17 @@ fun calculateDistance(myDistance: LatLng, containerDistance: LatLng?): String? {
     return distanceTo
 }
 
+
 fun calculateDistance(point1: LatLng, point2: LatLng): Double {
     val lat1 = point1.latitude
     val lat2 = point2.latitude
     val lon1 = point1.longitude
     val lon2 = point2.longitude
-    val r = 6371e3 // Earth radius in meters
-    val phi1 = lat1.toRadians()
-    val phi2 = lat2.toRadians()
-    val deltaPhi = (lat2 - lat1).toRadians()
-    val deltaLambda = (lon2 - lon1).toRadians()
+    val r = 6371.0 // Earth radius in kilometers
+    val phi1 = Math.toRadians(lat1)
+    val phi2 = Math.toRadians(lat2)
+    val deltaPhi = Math.toRadians(lat2 - lat1)
+    val deltaLambda = Math.toRadians(lon2 - lon1)
 
     val a = sin(deltaPhi / 2).pow(2) + cos(phi1) * cos(phi2) * sin(deltaLambda / 2).pow(2)
     val c = 2 * atan2(sqrt(a), sqrt(1 - a))
@@ -174,3 +175,30 @@ fun Int.toBinSize(): String{
     return sizeBinValues.getOrDefault(this, "Nenurodyta")
 }
 
+fun getDistance(latlng1: LatLng, latlng2: LatLng): Double {
+    val R = 6371 // Earth's radius in km
+    val dLat = (latlng2.latitude - latlng1.latitude) * PI / 180
+    val dLng = (latlng2.longitude - latlng1.longitude) * PI / 180
+    val a = sin(dLat/2) * sin(dLat/2) + cos(latlng1.latitude * PI / 180) * cos(latlng2.latitude * PI / 180) * sin(dLng/2) * sin(dLng/2)
+    val c = 2 * atan2(sqrt(a), sqrt(1-a))
+    return R * c
+}
+
+fun getTotalDistance(coords: List<LatLng>,userLoc: LatLng): String {
+    var totalDistance = 0.0
+    var currentLoc = userLoc
+    for (i in coords.indices) {
+        val distance = getDistance(currentLoc, coords[i])
+        totalDistance += distance
+        currentLoc = coords[i]
+    }
+    return String.format("%.2f", totalDistance)
+}
+
+fun getTotalTime(distance: Double): String {
+    val walkingSpeed = 4.0 // km/hour
+    val totalTime = distance / walkingSpeed
+    val hours = totalTime.toInt()
+    val minutes = ((totalTime - hours) * 60).toInt()
+    return "$hours hours, $minutes minutes"
+}

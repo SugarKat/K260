@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
@@ -68,9 +69,12 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.natureclean.R
 import com.natureclean.api.model.PollutionPoint
+import com.natureclean.calculateDistance
 import com.natureclean.checkMapPermissions
 import com.natureclean.distanceTo
 import com.natureclean.getOptimalHike
+import com.natureclean.getTotalDistance
+import com.natureclean.getTotalTime
 import com.natureclean.google.presentation.GooglePlacesInfoViewModel
 import com.natureclean.navigation.tabs.bitmapDescriptorFromVector
 import com.natureclean.ui.components.MainTopAppBar
@@ -104,6 +108,9 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
     val maxHikeRange = mainViewModel.maxRange.value
     val userLocation = mainViewModel.userLocation.value!!
 
+    var totalDistance by rememberSaveable { mutableStateOf("") }
+    var totalTime by rememberSaveable { mutableStateOf("") }
+
     val points = remember {
         getOptimalHike(
             coordinates,
@@ -112,13 +119,14 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
         ).toMutableStateList()
     }
 
+    val startingCoordinates = points[0]
     val timer = remember { Timer() }
 
-    val fusedLocationClient =
-
+    val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(
             context
         )
+    }
 
     val polyline = glaces.polylines.value
     var (greySegment, blueSegment) = splitPolyline(polyline, userLocation)
@@ -128,34 +136,22 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     if (location != null) {
-                        Log.e("location", location.latitude.toString())
+                        Log.e("location in hike map", location.latitude.toString())
                         mainViewModel.updateLocation(LatLng(location.latitude, location.longitude))
                         val (newGreySegment, newBlueSegment) = splitPolyline(polyline, userLocation)
                         greySegment = newGreySegment
                         blueSegment = newBlueSegment
-//                        val waypoints = if (points.size > 1) {
-//                            points.subList(1, points.size - 1)
-//                        } else {
-//                            null
-//                        }
-//                        glaces.getDirection(
-//                            origin = "${userLocation.latitude}, ${userLocation.longitude}",
-//                            waypoints = waypoints,
-//                            mode = routeMode,
-//                            destination = "${points.last().latitude}, ${points.last().longitude}"
-//                        )
-
+                        mainViewModel.updateUserDistance(calculateDistance(startingCoordinates, LatLng(location.latitude, location.longitude)).toInt())
                     }
                 }
         }
-    }, 0, 60 * 100)
+    }, 0, 60 * 100) // 6s
 
     DisposableEffect(Unit) {
         onDispose {
             timer.cancel()
         }
     }
-
 
 
     val latLngToPointMap = coordinates.zip(pointList).toMap()
@@ -176,7 +172,7 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
     }
     var myLocationEnabled by remember { mutableStateOf(false) } //permissions granted
 
-    val startingCoordinates = points[0]
+
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(startingCoordinates, 15F)
@@ -278,7 +274,7 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
 //                        }
                     },
                     clean = {
-                        if(point.longitude?.let {
+                        if (point.longitude?.let {
                                 point.latitude?.let { it1 ->
                                     LatLng(
                                         it1,
@@ -287,8 +283,9 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                                 }
                             }?.let { userLocation.distanceTo(it) }!! < 0.1) {
                             mainViewModel.cleanPoint(point) {}
-                        }else{
-                            Toast.makeText(context, "You must nearby the point", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(context, "You must nearby the point", Toast.LENGTH_LONG)
+                                .show()
                         }
                     }
                 )
@@ -416,10 +413,12 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                                 glaces.googlePlacesInfoState.value.direction?.routes?.get(
                                     0
                                 )?.legs?.get(0)?.distance?.text
+
                             }\n" + "Total time: ${
                                 glaces.googlePlacesInfoState.value.direction?.routes?.get(
                                     0
                                 )?.legs?.get(0)?.duration?.text
+
                             }",
                             modifier = Modifier
                                 .padding(top = 16.dp)
@@ -564,7 +563,10 @@ private fun distanceBetweenPoints(point1: LatLng, point2: LatLng): Double {
     return EARTH_RADIUS * c * 1000 // Convert to meters
 }
 
-private fun splitPolyline(polyline: List<LatLng>, location: LatLng): Pair<List<LatLng>, List<LatLng>> {
+private fun splitPolyline(
+    polyline: List<LatLng>,
+    location: LatLng
+): Pair<List<LatLng>, List<LatLng>> {
     var closestDistance = Double.MAX_VALUE
     var closestIndex = 0
     for (i in polyline.indices) {

@@ -65,7 +65,7 @@ class GooglePlacesInfoViewModel @Inject constructor(private val googleApi: Googl
 
                 is Resource.Error -> {
                     Log.i("response e", response.toString())
-                    Toast.makeText(context, "No better path is available", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "No better route is available", Toast.LENGTH_LONG).show()
 
                 }
 

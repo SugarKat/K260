@@ -88,9 +88,11 @@ fun Map(mainViewModel: MainViewModel) {
     val timer = remember { Timer() }
 
     val fusedLocationClient =
+
         LocationServices.getFusedLocationProviderClient(
             context
         )
+
 
     timer.schedule(object : TimerTask() {
         override fun run() {

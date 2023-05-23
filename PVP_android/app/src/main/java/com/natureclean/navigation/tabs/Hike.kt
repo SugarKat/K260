@@ -56,8 +56,11 @@ import com.natureclean.viewmodels.MainViewModel
 fun Hike(mainViewModel: MainViewModel, navController: NavController) {
 
     var showDialog by remember { mutableStateOf(false) }
+    var points by remember {mainViewModel.pollutionPoints}
 
-    if (showDialog) {
+
+    if(points.size > 1){
+        if (showDialog) {
         Dialog(
             onClose = {showDialog = false},
             onProceed = {
@@ -88,6 +91,11 @@ fun Hike(mainViewModel: MainViewModel, navController: NavController) {
             image = Icons.Filled.ChangeCircle
         ) {
             showDialog = true
+        }
+    }}
+    else{
+        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
+            Text("Currently, it is not available to create hiking path for you", )
         }
     }
 }

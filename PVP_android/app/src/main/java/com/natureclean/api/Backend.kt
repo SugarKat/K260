@@ -49,9 +49,9 @@ class Backend @Inject constructor(
         return Resource.Success(response)
     }
 
-    suspend fun updateUser(user: UserObj, points: Int): Resource<UserObj> {
+    suspend fun updateUser(user: UserObj): Resource<UserObj> {
         val response = try {
-            api.updateUser(id = user.id, user = user.copy(points = points))
+            api.updateUser(id = user.id, user = user)
         } catch (e: Exception) {
             Log.i("error", e.toString())
             return Resource.Error(e.message ?: "Error")

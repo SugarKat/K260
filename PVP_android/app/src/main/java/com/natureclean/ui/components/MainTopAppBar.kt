@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 val DARK_GREEN = Color(0xFF66b02c)
 
 @Composable
-fun MainTopAppBar(actionTitle: String = "", addPoint: () -> Unit= {}) {
+fun MainTopAppBar(actionTitle: String = "", addPoint: () -> Unit = {}) {
     TopAppBar(
         backgroundColor = DARK_GREEN,
         elevation = 0.dp
@@ -45,23 +45,27 @@ fun MainTopAppBar(actionTitle: String = "", addPoint: () -> Unit= {}) {
             )
             Spacer(modifier = Modifier.weight(1f))
             if (actionTitle.isNotEmpty()) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "",
-                    tint = Color.White,
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .clickable {
-                            addPoint()
-                        })
-                Text(
-                    text = actionTitle.uppercase(),
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    lineHeight = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
+                Row(modifier = Modifier.clickable {
+                    addPoint()
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                    )
+                    Text(
+                        text = actionTitle.uppercase(),
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        lineHeight = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+
+                    )
+                }
             }
         }
     }

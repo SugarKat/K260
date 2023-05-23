@@ -179,6 +179,26 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun updateUserDistance(distance: Int){
+        user.value?.let{
+            viewModelScope.launch {
+                when (val response =
+                    api.updateUser(
+                       it.user.copy(distance_travelled = distance)
+                    )) {
+                    is Resource.Success -> {
+                        Log.i("SUCCESS", "SUCES")
+
+                    }
+                    is Resource.Error -> {
+                        Log.e("ERR", "ERR")
+                        errorMessage.value = response.error?.message ?: "Could not fetch"
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
     fun registerPoint(name: String, description: String, type: Int, size: Int, callback: () -> Unit) {
         Log.e("IN FUNC", "IN FUNC")
         viewModelScope.launch {
@@ -215,7 +235,7 @@ class MainViewModel @Inject constructor(
                 is Resource.Success -> {
                     Log.e("SUCCES", "SUCCESS")
                     user.value?.let{
-                        api.updateUser(user = user.value!!.user, points = point.rating)
+                        api.updateUser(user = user.value!!.user.copy(points = point.rating))
                     }
                     callback()
                 }
@@ -277,7 +297,5 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-
-
 
 }

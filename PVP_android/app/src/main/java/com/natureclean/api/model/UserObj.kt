@@ -7,5 +7,6 @@ data class UserObj(
     val email_verified_at: String? = null,
     val points: Int = 0,
     val created_at: String,
-    val updated_at: String
+    val updated_at: String,
+    val distance_travelled: Int = 0,
 )
