@@ -5,6 +5,7 @@ import com.natureclean.api.Backend
 import com.natureclean.api.BackendInterface
 import com.natureclean.api.google.GoogleBackend
 import com.natureclean.api.google.GoogleBackendInterface
+import com.natureclean.proto.DataStoreRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -12,6 +13,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -39,6 +43,18 @@ object AppModule {
             val request = it.request()
             val builder = request.newBuilder()
             val url = request.url.newBuilder()
+
+            val db = DataStoreRepository(appContext)
+
+            val user = runBlocking {
+                db.userFlow.first()
+            }
+
+            if (user.token.isEmpty()) {
+                builder.header("Authorization", Credentials.basic("admin", "admin"))
+            } else {
+                builder.header("Authorization", "Bearer ${user.token}")
+            }
             it.proceed(builder.addHeader("Accept", "application/json").url(url.build()).build())
         }
 
@@ -46,13 +62,13 @@ object AppModule {
             level = HttpLoggingInterceptor.Level.BODY
         })
 
-        client.authenticator { _, response ->
-
-            response.request.newBuilder()
-                .header("Authorization", "Bearer 3|jM5bY2bzzap1O1YRYxukGxNtxewhYkkNf7IAwJRu")
-                .build()
-
-        }
+//        client.authenticator { _, response ->
+//
+//            response.request.newBuilder()
+//                .header("Authorization", "Bearer 3|jM5bY2bzzap1O1YRYxukGxNtxewhYkkNf7IAwJRu")
+//                .build()
+//
+//        }
 
         return Retrofit.Builder()
             .client(client.build())
@@ -65,7 +81,8 @@ object AppModule {
             )
             //http://10.0.2.2:8000/ //EMULATOR
             //http://192.168.0.101:8000
-            .baseUrl("http://10.0.2.2:8000/")
+
+            .baseUrl("http://192.168.13.95:8080")
             .build()
             .create(BackendInterface::class.java)
     }
@@ -106,5 +123,10 @@ object AppModule {
             .build()
             .create(GoogleBackendInterface::class.java)
     }
+    @Singleton
+    @Provides
+    fun provideDataStoreRepository(
+        @ApplicationContext context: Context
+    ) = DataStoreRepository(context)
 
 }

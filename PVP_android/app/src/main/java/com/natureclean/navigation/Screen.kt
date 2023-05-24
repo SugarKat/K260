@@ -6,8 +6,9 @@ sealed class Screen(val route: String){
     object Login : Screen("screen")
     object Register: Screen("register")
     object HikeMap: Screen("hike_map")
-
     object ManualHike: Screen("manual_hike")
+    object AdminPanel: Screen("admin_panel")
+
     fun withArgs(vararg args: Pair<String, String>): String {
         var res = route
         args.forEach {

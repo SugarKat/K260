@@ -1,6 +1,7 @@
 package com.natureclean.navigation
 
 
+import android.widget.Toast
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,6 +23,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.LatLng
 import com.natureclean.api.model.PollutionPoint
+import com.natureclean.api.model.UserCredentials
+import com.natureclean.navigateAndClearStack
 import com.natureclean.ui.components.ContainerAdd
 import com.natureclean.ui.components.DARK_GREEN
 import com.natureclean.ui.components.MainTopAppBar
@@ -31,6 +35,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AppScaffold() {
+    val context = LocalContext.current
     val mainViewModel: MainViewModel = hiltViewModel()
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -46,6 +51,7 @@ fun AppScaffold() {
             addState.collapse()
         }
     }
+
 
     fun openSheet() {
         //modalSheetContent = modalContent
@@ -143,10 +149,18 @@ fun AppScaffold() {
                     closeDialog = { closeSheet() },
                     userLocation = mainViewModel.userLocation.value ?: LatLng(0.0, 0.0),
                     register = {
-                        mainViewModel.addContainer(it) {
-                            mainViewModel.getContainers()
-                            closeSheet()
+
+                        if (it.name.isBlank() || it.description.isBlank()) {
+                            Toast.makeText(context, "Please fill in the values", Toast.LENGTH_LONG)
+                                .show()
+                        } else {
+                            mainViewModel.addContainer(it) {
+                                mainViewModel.getContainers()
+                                closeSheet()
+                            }
                         }
+
+
                     })
             }
 

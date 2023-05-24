@@ -1,11 +1,7 @@
 package com.natureclean.api.google
 
 import android.util.Log
-import com.natureclean.api.BackendInterface
 import com.natureclean.api.model.Resource
-import com.natureclean.api.model.User
-import com.natureclean.api.model.UserCredentials
-import com.natureclean.google.domain.model.GeocodedWaypoints
 import com.natureclean.google.domain.model.GooglePlacesInfo
 import com.natureclean.google.presentation.MAP_KEY
 import dagger.hilt.android.scopes.ActivityScoped

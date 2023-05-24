@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import com.natureclean.viewmodels.sizeBinValues
 import com.natureclean.viewmodels.sizePollutionValues
@@ -201,4 +202,11 @@ fun getTotalTime(distance: Double): String {
     val hours = totalTime.toInt()
     val minutes = ((totalTime - hours) * 60).toInt()
     return "$hours hours, $minutes minutes"
+}
+
+fun NavController.navigateAndClearStack(route: String){
+    this.navigate(route){
+        popUpTo(this@navigateAndClearStack.graph.id)
+    }
+
 }

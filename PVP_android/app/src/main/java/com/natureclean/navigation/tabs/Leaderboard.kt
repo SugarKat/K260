@@ -6,19 +6,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Filter
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -27,18 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import com.natureclean.api.model.User
-import com.natureclean.api.model.UserObj
 import com.natureclean.ui.components.DARK_GREEN
-import com.natureclean.ui.components.DropDownMenu
 import com.natureclean.viewmodels.MainViewModel
-import kotlinx.coroutines.launch
 
 const val FILTER_POINTS = "FILTER_POINTS"
 const val FILTER_DISTANCE = "FILTER_DISTANCE"
@@ -103,7 +89,7 @@ fun DropDownMenu(onChange: (String) -> Unit = {}) {
         Icon(Icons.Filled.Sort, "", modifier = Modifier
             .align(Alignment.TopEnd)
             .padding(top = 4.dp, end = 16.dp)
-            .background(DARK_GREEN, shape = CircleShape)
+            .background(Color.White, shape = CircleShape)
             .clip(CircleShape)
             .clickable {
                 expanded = !expanded; Log.e("clicked", "clicked")

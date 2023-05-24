@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'com.squareup.wire' version "$wire_version"
 }
 
 android {
@@ -90,4 +91,14 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi_version"
 
+    //Wire(SharedPreferences)
+    implementation "com.squareup.wire:wire-runtime:$wire_version"
+    implementation "com.squareup.wire:wire-moshi-adapter:$wire_version"
+
+    implementation  "androidx.datastore:datastore-core:$proto_datastore_version"
+    implementation "androidx.datastore:datastore:$proto_datastore_version"
+
+}
+wire {
+    kotlin {}
 }

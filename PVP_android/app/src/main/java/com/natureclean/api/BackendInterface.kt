@@ -1,5 +1,7 @@
 package com.natureclean.api
 
+import com.codelab.android.datastore.User
+import com.codelab.android.datastore.UserObj
 import com.natureclean.api.model.*
 import retrofit2.http.*
 

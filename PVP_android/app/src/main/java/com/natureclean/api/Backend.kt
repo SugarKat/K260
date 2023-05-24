@@ -1,6 +1,8 @@
 package com.natureclean.api
 
 import android.util.Log
+import com.codelab.android.datastore.User
+import com.codelab.android.datastore.UserObj
 import com.natureclean.api.model.*
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject

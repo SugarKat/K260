@@ -36,6 +36,7 @@ import com.natureclean.viewmodels.typePollutionValues
 
 @Composable
 fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, Int, Int) -> Unit) {
+    val context = LocalContext.current
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
@@ -96,7 +97,10 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, Int, Int) -
                 .weight(1f)
                 .requiredHeight(48.dp),
             onClick = {
-                if (name.isNotEmpty() && description.isNotEmpty()) {
+                if (name.isBlank() || description.isBlank()) {
+                    Toast.makeText(context, "Please fill in the values", Toast.LENGTH_LONG)
+                        .show()
+                } else {
                     function(name, description, type, size)
                 }
             },

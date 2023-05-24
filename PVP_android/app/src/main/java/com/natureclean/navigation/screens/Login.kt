@@ -1,5 +1,6 @@
 package com.natureclean.navigation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -8,24 +9,50 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.natureclean.api.model.UserCredentials
+import com.natureclean.navigateAndClearStack
 import com.natureclean.navigation.Screen
 import com.natureclean.navigation.Tabs
 import com.natureclean.viewmodels.MainViewModel
 
 @Composable
 fun Login(navController: NavController, mainViewModel: MainViewModel) {
-    var username by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+
+    val username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordConfirmation by remember { mutableStateOf("") }
 
     val error by remember { mainViewModel.errorMessage }
+
+
+
+    fun onValueChange() {
+        mainViewModel.resetError()
+    }
+
+    fun validate(email: String, password: String){
+        if(email.isBlank() || password.isBlank()){
+            Toast.makeText(context, "Please fill in the values", Toast.LENGTH_LONG).show()
+        }else{
+            mainViewModel.loginUser(
+                userCreds = UserCredentials(
+                    name = username,
+                    email = email,
+                    password = password,
+                )
+            ) {
+                navController.navigateAndClearStack(Tabs.Map.route)
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -39,29 +66,26 @@ fun Login(navController: NavController, mainViewModel: MainViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = {
+                onValueChange()
+                email = it
+            },
             placeholder = { Text("user@email.com") },
             label = { Text("email") }
         )
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = {
+                password = it; onValueChange()
+            },
             visualTransformation = PasswordVisualTransformation(),
             label = { Text("password") }
 
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            mainViewModel.loginUser(
-                userCreds = UserCredentials(
-                    name = username,
-                    email = email,
-                    password = password,
-                )
-            ) {
-                navController.navigate(Tabs.Map.route)
-            }
+           validate(email, password)
         }
         ) {
             Text("Login")

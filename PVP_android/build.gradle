@@ -7,6 +7,8 @@ buildscript {
         activity_compose_version = '1.7.0'
         compose_compiler_version = '1.4.2'
         compose_bom_version = '2023.04.00'
+        proto_datastore_version = '1.0.0'
+        wire_version = '4.5.5'
 
 
 

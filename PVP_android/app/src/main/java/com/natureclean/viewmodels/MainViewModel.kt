@@ -7,12 +7,17 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.codelab.android.datastore.User
+import com.codelab.android.datastore.UserObj
 import com.google.android.gms.maps.model.LatLng
 import com.natureclean.api.Backend
 import com.natureclean.api.model.*
 import com.natureclean.navigation.Tabs
+import com.natureclean.proto.DataStoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 
@@ -38,13 +43,16 @@ val typePollutionValues = mutableMapOf(
 val sizePollutionValues = mutableMapOf(
     1 to "Mažas užterštumas",
     2 to "Didelis užterštumas",
-    3 to "Labi didelis užterštumas",
+    3 to "Labai didelis užterštumas",
 )
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    private val dataStore: DataStoreRepository,
     private val api: Backend,
 ) : ViewModel() {
+
+
 
     var errorMessage = mutableStateOf("")
     var userLocation = mutableStateOf<LatLng?>(null)
@@ -66,12 +74,22 @@ class MainViewModel @Inject constructor(
     @OptIn(ExperimentalMaterialApi::class)
     var globalSheetState: BottomSheetScaffoldState? = null
 
+    val userStorage = dataStore.userFlow
+
+    init {
+        viewModelScope.launch {
+            user.value = dataStore.userFlow.first()
+        }
+    }
+
     @OptIn(ExperimentalMaterialApi::class)
     fun setSheetState(sheetState: BottomSheetScaffoldState){
         globalSheetState = sheetState
     }
 
-
+    fun resetError(){
+        errorMessage.value = ""
+    }
     fun setMaxRange(value: Int){
         maxRange.value = value
     }
@@ -152,9 +170,11 @@ class MainViewModel @Inject constructor(
                     )
                 )) {
                 is Resource.Success -> {
-                    user.value = response.data
-                    callback()
-                    Log.i("SUCCESS", response.toString())
+                    response.data?.let{
+                        dataStore.updateUser(it)
+                        callback()
+                        Log.i("SUCCESS", response.toString())
+                    }
                 }
                 is Resource.Error -> {
                     errorMessage.value = response.error?.message ?: "Could not login"
@@ -183,9 +203,12 @@ class MainViewModel @Inject constructor(
         user.value?.let{
             viewModelScope.launch {
                 when (val response =
-                    api.updateUser(
-                       it.user.copy(distance_travelled = distance)
-                    )) {
+                    it.user?.let { it1 ->
+                        val distanceTravelled = it1.distance_travelled + distance
+                        api.updateUser(
+                            it1.copy(distance_travelled = distanceTravelled)
+                        )
+                    }) {
                     is Resource.Success -> {
                         Log.i("SUCCESS", "SUCES")
 
@@ -235,7 +258,7 @@ class MainViewModel @Inject constructor(
                 is Resource.Success -> {
                     Log.e("SUCCES", "SUCCESS")
                     user.value?.let{
-                        api.updateUser(user = user.value!!.user.copy(points = point.rating))
+                        user.value!!.user?.let { it1 -> api.updateUser(user = it1.copy(points = point.rating)) }
                     }
                     callback()
                 }
@@ -295,6 +318,12 @@ class MainViewModel @Inject constructor(
                 }
                 else -> {}
             }
+        }
+    }
+    fun logOffUser(navigate:() -> Unit) {
+        viewModelScope.launch {
+            dataStore.updateUser(null)
+            navigate()
         }
     }
 
