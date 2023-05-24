@@ -82,7 +82,7 @@ object AppModule {
             //http://10.0.2.2:8000/ //EMULATOR
             //http://192.168.0.101:8000
 
-            .baseUrl("http://192.168.13.95:8080")
+            .baseUrl("http://10.0.2.2:8000/")
             .build()
             .create(BackendInterface::class.java)
     }
