@@ -31,6 +31,7 @@ class PollutionPointController extends Controller
             'latitude' => 'required',
             'rating' => 'required',
             'type' => 'required',
+            'size' => 'required'
         ]);
         $pollution_point = PollutionPoint::create([
             'name' => $fields['name'],
@@ -39,6 +40,7 @@ class PollutionPointController extends Controller
             'latitude' => $fields['latitude'],
             'rating' => $fields['rating'],
             'type' => $fields['type'],
+            'size' => $fields['size'],
             'isActive' => 1,
             'reportCount' => 0,
         ]);

@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('description');
             $table->string('longitude');
             $table->string('latitude');
-            $table->string('type');
-            $table->string('size');
+            $table->integer('type');
+            $table->integer('size');
 
         });
     }
