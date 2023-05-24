@@ -39,7 +39,9 @@ fun AdminPanel(mainViewModel: MainViewModel, navController: NavController) {
     if (adminData != null) {
         Column(
         ) {
-            Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)) {
                 Icon(
                     Icons.Filled.ArrowBack,
                     "",
@@ -54,10 +56,11 @@ fun AdminPanel(mainViewModel: MainViewModel, navController: NavController) {
                 Spacer(modifier = Modifier.weight(1f))
             }
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .verticalScroll(rememberScrollState())
 
-                        .padding(16.dp)
+                    .padding(16.dp)
             ) {
                 adminData?.let { adminData ->
                     Text("General data:", fontSize = 18.sp, fontWeight = FontWeight.Bold)
