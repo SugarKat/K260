@@ -16,6 +16,7 @@ class PollutionPoint extends Model
         'latitude',
         'rating',
         'type',
+        'size',
         'isActive',
         'reportCount',
     ];

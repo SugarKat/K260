@@ -7,10 +7,7 @@ use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\PollutionPointController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GarbageDisposalPointController;
-
-
-
-
+use App\Http\Controllers\AdminPanelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +35,6 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
 });
 
 Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function() {
-    Route::get('admin-panel', [UserController::class, 'index']);
+    Route::get('admin-panel', [AdminPanelController::class, 'index']);
 });
 

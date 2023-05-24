@@ -21,7 +21,8 @@ return new class extends Migration
             $table->string('longitude');
             $table->string('latitude');
             $table->string('rating');
-            $table->string('type');
+            $table->integer('type');
+            $table->integer('size');
             $table->integer('isActive');
             $table->integer('reportCount');
         });
