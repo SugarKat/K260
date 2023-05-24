@@ -18,10 +18,10 @@ data class AdminData(
     val totalTrashCleanedBySize: TotalTrashCleanedBySize,
     @Json(name = "total_trash_cleaned_by_type")
     val totalTrashCleanedByType: List<TotalTrashCleanedByType>,
-    @Json(name = "total_trash_not_cleaned_by_size")
-    val totalTrashNotCleanedBySize: TotalTrashNotCleanedBySize,
     @Json(name = "total_trash_not_cleaned_by_type")
     val totalTrashNotCleanedByType: List<TotalTrashNotCleanedByType>,
+    @Json(name = "total_trash_not_cleaned_by_size")
+    val totalTrashNotCleanedBySize: TotalTrashNotCleanedBySize,
     @Json(name = "user_count")
     val userCount: Int,
     @Json(name = "user_total_walked")

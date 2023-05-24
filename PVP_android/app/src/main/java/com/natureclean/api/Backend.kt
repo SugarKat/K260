@@ -100,4 +100,14 @@ class Backend @Inject constructor(
         return Resource.Success(response)
     }
 
+    suspend fun getAdminData(): Resource<AdminData>{
+        val response = try {
+            api.getAdminData()
+        } catch (e: Exception) {
+            Log.i("error", e.toString())
+            return Resource.Error(e.message ?: "Error")
+        }
+        return Resource.Success(response)
+    }
+
 }

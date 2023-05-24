@@ -49,5 +49,8 @@ interface BackendInterface {
     @GET("api/user")
     suspend fun users(): List<UserObj>
 
+    @GET("api/admin-panel")
+    suspend fun getAdminData(): AdminData
+
 
 }

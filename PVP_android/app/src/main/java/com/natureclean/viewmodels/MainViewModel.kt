@@ -53,6 +53,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
 
+    var adminData = mutableStateOf<AdminData?>(null)
 
     var errorMessage = mutableStateOf("")
     var userLocation = mutableStateOf<LatLng?>(null)
@@ -83,27 +84,29 @@ class MainViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalMaterialApi::class)
-    fun setSheetState(sheetState: BottomSheetScaffoldState){
+    fun setSheetState(sheetState: BottomSheetScaffoldState) {
         globalSheetState = sheetState
     }
 
-    fun resetError(){
+    fun resetError() {
         errorMessage.value = ""
     }
-    fun setMaxRange(value: Int){
+
+    fun setMaxRange(value: Int) {
         maxRange.value = value
     }
 
-    fun autoHikeMode(){
+    fun autoHikeMode() {
         pathPoints.value = pollutionPoints.value
     }
-    fun setPathCoordinates(coordinates: List<PollutionPoint>){
+
+    fun setPathCoordinates(coordinates: List<PollutionPoint>) {
 
         pathPoints.value = coordinates
     }
 
-    fun topBarAction(route: String?){
-        when(route){
+    fun topBarAction(route: String?) {
+        when (route) {
 //            Tabs.Map.route ->{
 //                showBinAdd.value = false
 //                showPollutionAdd.value = true
@@ -119,18 +122,20 @@ class MainViewModel @Inject constructor(
     }
 
 
-    fun showPointAdd(){
+    fun showPointAdd() {
         showBinAdd.value = false
         showPollutionAdd.value = true
     }
-    fun showBinAdd(){
+
+    fun showBinAdd() {
         showPollutionAdd.value = false
         showBinAdd.value = true
     }
 
-    fun setPollutionPoint(point: PollutionPoint){
+    fun setPollutionPoint(point: PollutionPoint) {
         currentPollutionPoint.value = point
     }
+
     fun updateLocation(newLoc: LatLng) {
         userLocation.value = newLoc
     }
@@ -150,9 +155,11 @@ class MainViewModel @Inject constructor(
                 is Resource.Success -> {
                     callback()
                 }
+
                 is Resource.Error -> {
                     errorMessage.value = response.error?.message ?: "Could not login"
                 }
+
                 else -> {}
             }
         }
@@ -170,15 +177,17 @@ class MainViewModel @Inject constructor(
                     )
                 )) {
                 is Resource.Success -> {
-                    response.data?.let{
+                    response.data?.let {
                         dataStore.updateUser(it)
                         callback()
                         Log.i("SUCCESS", response.toString())
                     }
                 }
+
                 is Resource.Error -> {
                     errorMessage.value = response.error?.message ?: "Could not login"
                 }
+
                 else -> {}
             }
         }
@@ -191,16 +200,18 @@ class MainViewModel @Inject constructor(
                 is Resource.Success -> {
                     pollutionPoints.value = response.data!!
                 }
+
                 is Resource.Error -> {
                     errorMessage.value = response.error?.message ?: "Could not fetch"
                 }
+
                 else -> {}
             }
         }
     }
 
-    fun updateUserDistance(distance: Int){
-        user.value?.let{
+    fun updateUserDistance(distance: Int) {
+        user.value?.let {
             viewModelScope.launch {
                 when (val response =
                     it.user?.let { it1 ->
@@ -213,16 +224,25 @@ class MainViewModel @Inject constructor(
                         Log.i("SUCCESS", "SUCES")
 
                     }
+
                     is Resource.Error -> {
                         Log.e("ERR", "ERR")
                         errorMessage.value = response.error?.message ?: "Could not fetch"
                     }
+
                     else -> {}
                 }
             }
         }
     }
-    fun registerPoint(name: String, description: String, type: Int, size: Int, callback: () -> Unit) {
+
+    fun registerPoint(
+        name: String,
+        description: String,
+        type: Int,
+        size: Int,
+        callback: () -> Unit
+    ) {
         Log.e("IN FUNC", "IN FUNC")
         viewModelScope.launch {
             when (val response =
@@ -240,16 +260,19 @@ class MainViewModel @Inject constructor(
                     Log.i("SUCCESS", "SUCES")
                     callback()
                 }
+
                 is Resource.Error -> {
                     Log.e("ERR", "ERR")
 
                     errorMessage.value = response.error?.message ?: "Could not fetch"
                 }
+
                 else -> {}
             }
         }
     }
-    fun cleanPoint(point: PollutionPoint, callback: () -> Unit){
+
+    fun cleanPoint(point: PollutionPoint, callback: () -> Unit) {
         viewModelScope.launch {
             when (val response =
                 api.updatePoint(
@@ -257,20 +280,22 @@ class MainViewModel @Inject constructor(
                 )) {
                 is Resource.Success -> {
                     Log.e("SUCCES", "SUCCESS")
-                    user.value?.let{
+                    user.value?.let {
                         user.value!!.user?.let { it1 -> api.updateUser(user = it1.copy(points = point.rating)) }
                     }
                     callback()
                 }
+
                 is Resource.Error -> {
                     errorMessage.value = response.error?.message ?: "Could not fetch"
                 }
+
                 else -> {}
             }
         }
     }
 
-    fun addContainer(container: Container, callback: () -> Unit){
+    fun addContainer(container: Container, callback: () -> Unit) {
         viewModelScope.launch {
             when (val response =
                 api.addContainer(
@@ -279,14 +304,17 @@ class MainViewModel @Inject constructor(
                 is Resource.Success -> {
                     callback()
                 }
+
                 is Resource.Error -> {
                     errorMessage.value = response.error?.message ?: "Could not fetch"
                 }
+
                 else -> {}
             }
         }
     }
-    fun getContainers(){
+
+    fun getContainers() {
         viewModelScope.launch {
             when (val response =
                 api.getContainers(
@@ -294,36 +322,60 @@ class MainViewModel @Inject constructor(
                 is Resource.Success -> {
                     containers.value = response.data!!
                 }
+
                 is Resource.Error -> {
                     errorMessage.value = response.error?.message ?: "Could not fetch"
                 }
+
                 else -> {}
             }
         }
     }
 
-    fun getUsers(){
+    fun getUsers() {
         viewModelScope.launch {
             when (val response =
                 api.getUsers()) {
                 is Resource.Success -> {
-                    response.data?.let{
-                        users.value = it.sortedBy { user->
+                    response.data?.let {
+                        users.value = it.sortedBy { user ->
                             user.points
                         }
                     }
                 }
+
                 is Resource.Error -> {
                     errorMessage.value = response.error?.message ?: "Could not fetch"
                 }
+
                 else -> {}
             }
         }
     }
-    fun logOffUser(navigate:() -> Unit) {
+
+    fun logOffUser(navigate: () -> Unit) {
         viewModelScope.launch {
             dataStore.updateUser(null)
             navigate()
+        }
+    }
+
+    fun getAdminData() {
+        viewModelScope.launch {
+            when (val response =
+                api.getAdminData()) {
+                is Resource.Success -> {
+                    response.data?.let {
+                        adminData.value = it
+                    }
+                }
+
+                is Resource.Error -> {
+                    errorMessage.value = response.error?.message ?: "Could not fetch"
+                }
+
+                else -> {}
+            }
         }
     }
 
