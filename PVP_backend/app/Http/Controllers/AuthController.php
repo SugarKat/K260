@@ -64,7 +64,7 @@ class AuthController extends Controller{
             'roles' => $roles
         ];
 
-        return response($response, 201);
+        return response($response, 200);
     }
 
 }
