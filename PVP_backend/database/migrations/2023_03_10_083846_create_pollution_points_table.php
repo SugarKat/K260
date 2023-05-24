@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('latitude');
             $table->string('rating');
             $table->integer('type');
-            $table->integer('size');
             $table->integer('isActive');
             $table->integer('reportCount');
         });

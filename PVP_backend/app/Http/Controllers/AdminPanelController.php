@@ -30,9 +30,9 @@ class AdminPanelController extends Controller
         ];
 
         $total_trash_by_size = [
-            '1' => ['Small pollution', $trash->where('size', 1)->count()],
-            '2' => ['Large pollution', $trash->where('size', 2)->count()],
-            '3' => ['Very large pollution', $trash->where('size', 3)->count()],
+            '1' => ['Small pollution', $trash->where('rating', 1)->count()],
+            '2' => ['Large pollution', $trash->where('rating', 2)->count()],
+            '3' => ['Very large pollution', $trash->where('rating', 3)->count()],
         ];
 
         $total_trash_cleaned_by_type = [[
@@ -44,9 +44,9 @@ class AdminPanelController extends Controller
         ]];
 
         $total_trash_cleaned_by_size = [
-            '1' => ['Small pollution', $trash->where('size', 1)->where('isActive', 0)->count()],
-            '2' => ['Large pollution', $trash->where('size', 2)->where('isActive', 0)->count()],
-            '3' => ['Very large pollution', $trash->where('size', 3)->where('isActive', 0)->count()],
+            '1' => ['Small pollution', $trash->where('rating', 1)->where('isActive', 0)->count()],
+            '2' => ['Large pollution', $trash->where('rating', 2)->where('isActive', 0)->count()],
+            '3' => ['Very large pollution', $trash->where('rating', 3)->where('isActive', 0)->count()],
         ];
 
         $total_trash_not_cleaned_by_type = [[
@@ -58,9 +58,9 @@ class AdminPanelController extends Controller
         ]];
 
         $total_trash_not_cleaned_by_size = [
-            '1' => ['Small pollution', $trash->where('size', 1)->where('isActive', 1)->count()],
-            '2' => ['Large pollution', $trash->where('size', 2)->where('isActive', 1)->count()],
-            '3' => ['Very large pollution', $trash->where('size', 3)->where('isActive', 1)->count()],
+            '1' => ['Small pollution', $trash->where('rating', 1)->where('isActive', 1)->count()],
+            '2' => ['Large pollution', $trash->where('rating', 2)->where('isActive', 1)->count()],
+            '3' => ['Very large pollution', $trash->where('rating', 3)->where('isActive', 1)->count()],
         ];
 
         $response = [
