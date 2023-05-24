@@ -36,7 +36,7 @@ fun Account(navController: NavController, mainViewModel: MainViewModel) {
         user?.let {
             if(it.roles.isNotEmpty()) {
                 if (it.roles[0] == "writer") {
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(onClick = { navController.navigate(Screen.AdminPanel.route) }) {
                         Text(
                             "ADMIN PANEL",
                             color = Color.White
