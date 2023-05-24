@@ -74,9 +74,12 @@ fun Hike(mainViewModel: MainViewModel, navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(64.dp))
+        Text("CHOOSE YOUR PATH", fontWeight = FontWeight.Bold, fontSize = 32.sp)
+        Spacer(modifier = Modifier.height(128.dp))
         ListElem(
             title = "Generate manually",
             subtitle = "Select manually litter locations, and hike map will be generated",
@@ -92,6 +95,7 @@ fun Hike(mainViewModel: MainViewModel, navController: NavController) {
         ) {
             showDialog = true
         }
+        Spacer(modifier = Modifier.weight(1f))
     }}
     else{
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){

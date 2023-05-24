@@ -43,14 +43,14 @@ fun ManualHike(mainViewModel: MainViewModel, navController: NavController) {
     val trashPoints = mainViewModel.pollutionPoints.value
 
 
-    val chosenPoints = remember {mutableStateListOf<PollutionPoint>()}
+    val chosenPoints = remember { mutableStateListOf<PollutionPoint>() }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(DARK_GREEN), horizontalAlignment = Alignment.CenterHorizontally
+            .padding(top = 4.dp, bottom = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        MainTopAppBar()
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
@@ -94,6 +94,7 @@ fun ManualHike(mainViewModel: MainViewModel, navController: NavController) {
                 Spacer(modifier = Modifier.height(4.dp))
             }
         }
+        Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = {
                 mainViewModel.setPathCoordinates(chosenPoints)

@@ -91,7 +91,7 @@ import java.util.Timer
 import java.util.TimerTask
 
 
-@SuppressLint("StateFlowValueCalledInComposition", "MissingPermission")
+@SuppressLint("StateFlowValueCalledInComposition", "MissingPermission", "RememberReturnType")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
@@ -131,7 +131,7 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
     val polyline = glaces.polylines.value
     var (greySegment, blueSegment) = splitPolyline(polyline, userLocation)
 
-    timer.schedule(object : TimerTask() {
+    remember {timer.schedule(object : TimerTask() {
         override fun run() {
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
@@ -141,11 +141,12 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                         val (newGreySegment, newBlueSegment) = splitPolyline(polyline, userLocation)
                         greySegment = newGreySegment
                         blueSegment = newBlueSegment
-                        mainViewModel.updateUserDistance(calculateDistance(startingCoordinates, LatLng(location.latitude, location.longitude)).toInt())
+                        //mainViewModel.updateUserDistance(calculateDistance(startingCoordinates, LatLng(location.latitude, location.longitude)).toInt())
                     }
                 }
         }
-    }, 0, 60 * 100) // 6s
+    }, 0, 60 * 100)} // 6s
+
 
     DisposableEffect(Unit) {
         onDispose {
