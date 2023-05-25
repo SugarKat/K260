@@ -64,7 +64,11 @@ fun ManualHike(mainViewModel: MainViewModel, navController: NavController) {
                             it2
                         )
                     }
-            }) { point ->
+            }.filter { point ->
+                point.isActive == 1
+            }
+
+            ) { point ->
                 val distance = calculateDistance(
                     myLocation!!,
                     point.latitude?.let { point.longitude?.let { it1 -> LatLng(it, it1) } })

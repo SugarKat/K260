@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.natureclean.api.model.Container
 import com.natureclean.api.model.PollutionPoint
 import com.natureclean.calculateDistance
+import com.natureclean.toWasteSize
 import com.natureclean.toWasteType
 import com.natureclean.viewmodels.sizeBinValues
 import com.natureclean.viewmodels.sizePollutionValues
@@ -230,6 +231,15 @@ fun PollutionClean(point: PollutionPoint, closeDialog: () -> Unit, onClick: () -
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Size: ${point.rating.toWasteSize()}",
+                        color = Color.Black,
+                        fontWeight = FontWeight(700),
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             },
             onDismissRequest = {
@@ -299,7 +309,6 @@ fun PollutionClean(point: PollutionPoint, closeDialog: () -> Unit, onClick: () -
                 ) {
                     Button(
                         onClick = {
-                            areyousure = false
                             onClick()
                         },
                     ) { Text("YES") }

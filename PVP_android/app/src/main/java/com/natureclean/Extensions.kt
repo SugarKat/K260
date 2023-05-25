@@ -94,7 +94,7 @@ fun getOptimalHike(
     val remainingCoordinates = coordinates.toMutableList()
 
     // Sort the coordinates by distance from starting position
-    remainingCoordinates.sortBy { it.distanceTo(startingPosition).toDouble() }
+    remainingCoordinates.sortBy { it.distanceTo(startingPosition)}
 
     val hikeCoordinates = mutableListOf(startingPosition)
     var currentLocation = startingPosition

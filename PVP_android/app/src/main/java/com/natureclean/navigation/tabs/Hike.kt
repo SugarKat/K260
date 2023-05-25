@@ -56,7 +56,9 @@ import com.natureclean.viewmodels.MainViewModel
 fun Hike(mainViewModel: MainViewModel, navController: NavController) {
 
     var showDialog by remember { mutableStateOf(false) }
-    var points by remember {mainViewModel.pollutionPoints}
+    val points = remember {mainViewModel.pollutionPoints.value.filter { point ->
+        point.isActive == 1
+    }}
 
 
     if(points.size > 1){
@@ -99,7 +101,7 @@ fun Hike(mainViewModel: MainViewModel, navController: NavController) {
     }}
     else{
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-            Text("Currently, it is not available to create hiking path for you", )
+            Text("Currently, there are no active trash sites, hence it is not available to create hiking path for you.", textAlign = TextAlign.Center)
         }
     }
 }
@@ -191,7 +193,7 @@ fun Dialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 androidx.compose.material.Text(
-                    text = "In order to generate hiking path, we need you to select maximum range, your hike should take from your location.",
+                    text = "In order to generate hiking path, we need you to select maximum range between trash points from your location.",
                     color = Color.Black,
                     fontWeight = FontWeight(700),
                     fontSize = 18.sp,

@@ -8,15 +8,18 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetValue
+import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -76,6 +79,8 @@ import com.natureclean.getOptimalHike
 import com.natureclean.getTotalDistance
 import com.natureclean.getTotalTime
 import com.natureclean.google.presentation.GooglePlacesInfoViewModel
+import com.natureclean.navigateAndClearStack
+import com.natureclean.navigation.Tabs
 import com.natureclean.navigation.tabs.bitmapDescriptorFromVector
 import com.natureclean.ui.components.MainTopAppBar
 import com.natureclean.ui.components.PollutionInfo
@@ -141,7 +146,7 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                         val (newGreySegment, newBlueSegment) = splitPolyline(polyline, userLocation)
                         greySegment = newGreySegment
                         blueSegment = newBlueSegment
-                        //mainViewModel.updateUserDistance(calculateDistance(startingCoordinates, LatLng(location.latitude, location.longitude)).toInt())
+                        mainViewModel.updateUserDistance(calculateDistance(startingCoordinates, LatLng(location.latitude, location.longitude)).toInt())
                     }
                 }
         }
@@ -430,7 +435,14 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                     }
                 }
             } else {
-                Text("NO HIKE AVAILABLE")
+                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Currently no trash points in hike")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = {navController.navigateAndClearStack(Tabs.Map.route)}){
+                        Text("Get back")
+                    }
+
+                }
             }
         } else {
             CircularProgressIndicator()

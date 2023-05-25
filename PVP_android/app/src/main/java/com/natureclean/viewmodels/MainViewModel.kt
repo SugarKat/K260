@@ -22,28 +22,28 @@ import javax.inject.Inject
 
 
 val typeBinValues = mutableMapOf(
-    1 to "Plastikui",
-    2 to "Popieriui",
-    3 to "Stiklui",
-    4 to "Mišriom atliekom"
+    1 to "Plastic",
+    2 to "Paper",
+    3 to "Glass",
+    4 to "Mixed"
 )
 val sizeBinValues = mutableMapOf(
-    1 to "Maža šiukšliadėžė",
-    2 to "Vidutinė šiukšliadėžė",
-    3 to "Didelė šiukšliadėžė"
+    1 to "Small bin",
+    2 to "Average bin",
+    3 to "Large bin"
 )
 
 val typePollutionValues = mutableMapOf(
-    1 to "Plastikas",
-    2 to "Popierius",
-    3 to "Stiklas",
-    4 to "Stambiagabaritės",
-    5 to "Mišrios"
+    1 to "Plastic",
+    2 to "Paper",
+    3 to "Glass",
+    4 to "Large-scale",
+    5 to "Mixed"
 )
 val sizePollutionValues = mutableMapOf(
-    1 to "Mažas užterštumas",
-    2 to "Didelis užterštumas",
-    3 to "Labai didelis užterštumas",
+    1 to "Small pollution",
+    2 to "Average pollution",
+    3 to "Extreme pollution",
 )
 
 @HiltViewModel
@@ -281,7 +281,10 @@ class MainViewModel @Inject constructor(
                 is Resource.Success -> {
                     Log.e("SUCCES", "SUCCESS")
                     user.value?.let {
-                        user.value!!.user?.let { it1 -> api.updateUser(user = it1.copy(points = point.rating)) }
+                        val points = it.user?.points
+                        user.value!!.user?.let { it1 -> api.updateUser(user = it1.copy(points = points?.plus(
+                            point.rating
+                        ) ?: point.rating)) }
                     }
                     callback()
                 }
