@@ -1,5 +1,6 @@
 package com.natureclean.navigation.tabs
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,6 +56,7 @@ import com.natureclean.viewmodels.MainViewModel
 
 @Composable
 fun Hike(mainViewModel: MainViewModel, navController: NavController) {
+    val context = LocalContext.current
 
     var showDialog by remember { mutableStateOf(false) }
     val points = remember {mainViewModel.pollutionPoints.value.filter { point ->
@@ -66,9 +69,14 @@ fun Hike(mainViewModel: MainViewModel, navController: NavController) {
         Dialog(
             onClose = {showDialog = false},
             onProceed = {
-                mainViewModel.setMaxRange(it.toInt())
-                mainViewModel.autoHikeMode()
-                navController.navigate(Screen.HikeMap.route)
+                if(it >= 1F) {
+                    mainViewModel.setMaxRange(it.toInt())
+                    mainViewModel.autoHikeMode()
+                    navController.navigate(Screen.HikeMap.route)
+
+                }else{
+                    Toast.makeText(context, "Range must be greater than 0 km", Toast.LENGTH_LONG).show()
+                }
             }
         )
     }
@@ -80,7 +88,7 @@ fun Hike(mainViewModel: MainViewModel, navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(64.dp))
-        Text("CHOOSE YOUR PATH", fontWeight = FontWeight.Bold, fontSize = 32.sp)
+        Text("Start your hike".uppercase(), fontWeight = FontWeight.Bold, fontSize = 32.sp)
         Spacer(modifier = Modifier.height(128.dp))
         ListElem(
             title = "Generate manually",

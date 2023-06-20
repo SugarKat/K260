@@ -62,9 +62,12 @@ fun Leaderboard(mainViewModel: MainViewModel) {
                     itemsIndexed(users.sortedByDescending {
                         if(filteredBy == FILTER_POINTS) {
                             it.points
-                        }else it.distance_travelled
+                        }else it.distance_travelled.toInt()
                     }) { index, user -> //users
-                        UserItem(user.name, user.points.toString(), distance = user.distance_travelled.toString(), index = (index + 1).toString())
+                        UserItem(user.name, user.points.toString(), distance =
+                        String.format("%.2f", user.distance_travelled)
+                       ,
+                            index = (index + 1).toString())
                         Spacer(modifier = Modifier.height(4.dp))
                     }
                 }

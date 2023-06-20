@@ -63,16 +63,8 @@ fun AppScaffold() {
         mainViewModel.setSheetState(sheetState = sheetState)
     }
 
-    var topTitle by remember { mutableStateOf("Add point") }
+    var topTitle by remember { mutableStateOf("Add trash") }
 
-    val topBar: @Composable () -> Unit = {
-        if (isTab(navBackStackEntry)) {
-            MainTopAppBar(topTitle) {
-                mainViewModel.showPointAdd()
-                openSheet()
-            }
-        }
-    }
     val bottomBar: @Composable () -> Unit = {
         if (isTab(navBackStackEntry)) {
             BottomNavigation(
@@ -85,6 +77,8 @@ fun AppScaffold() {
                 val currentRoute = navBackStackEntry?.destination?.route
                 bottomBarTabs.forEach { screen ->
                     val title = screen.title
+                    //topTitle = screen.actionTitle
+
                     BottomNavigationItem(
                         icon = {
                             Icon(
@@ -125,7 +119,14 @@ fun AppScaffold() {
             }
         }
     }
-
+    val topBar: @Composable (arg: String) -> Unit = { arg ->
+        if (isTab(navBackStackEntry)) {
+            MainTopAppBar(arg) {
+                mainViewModel.showPointAdd()
+                openSheet()
+            }
+        }
+    }
     BottomSheetScaffold(
         scaffoldState = sheetState,
         sheetPeekHeight = 0.dp,
@@ -168,7 +169,7 @@ fun AppScaffold() {
         sheetShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
     ) {
         Scaffold(
-            topBar = { topBar() },
+            topBar = { topBar(if(navBackStackEntry?.destination?.route == Tabs.Map.route) "Add trash" else "") },
             bottomBar = { bottomBar() },
         ) {
             Navigation(

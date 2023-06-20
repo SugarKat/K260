@@ -17,6 +17,11 @@ interface BackendInterface {
         @Body userCred: UserCredentials
     ): User
 
+    @GET("api/user/{id}")
+    suspend fun getUser(
+        @Path("id") id: String
+    ): UserObj
+
     @PUT("api/user/{id}")
     suspend fun updateUser(
         @Path("id") id: String,

@@ -25,5 +25,5 @@ data class AdminData(
     @Json(name = "user_count")
     val userCount: Int,
     @Json(name = "user_total_walked")
-    val userTotalWalked: Int
+    val userTotalWalked: Double
 )

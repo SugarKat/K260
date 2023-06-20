@@ -11,12 +11,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.natureclean.api.google.GoogleBackend
 import com.natureclean.api.model.Resource
 import com.natureclean.formatGoogleWaypoints
-import com.natureclean.google.domain.model.GeocodedWaypoints
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,12 +28,16 @@ class GooglePlacesInfoViewModel @Inject constructor(private val googleApi: Googl
 
 
     val polylines = mutableStateOf<List<LatLng>>(emptyList())
+
+
     fun getDirection(
         context: Context? = null,
         origin: String,
         destination: String,
         waypoints: List<LatLng>?,
-        mode: String = "walking"
+        mode: String = "walking",
+        successCallback: () -> Unit = {},
+        callback: () -> Unit = {}
     ) {
         Log.e("my points", waypoints.toString())
         viewModelScope.launch {
@@ -59,13 +58,16 @@ class GooglePlacesInfoViewModel @Inject constructor(private val googleApi: Googl
                             points = it
                         )
                     }
+                    successCallback()
                     Log.i("response suc", response.data.toString())
+                    callback()
 
                 }
 
                 is Resource.Error -> {
                     Log.i("response e", response.toString())
-                    Toast.makeText(context, "No better route is available", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "No bicycling route is available", Toast.LENGTH_LONG).show()
+                    callback()
 
                 }
 

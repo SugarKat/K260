@@ -11,12 +11,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.Button
@@ -28,6 +32,8 @@ import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.PedalBike
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Person2
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.SportsScore
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,7 +54,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.android.gms.location.LocationServices
@@ -76,12 +86,14 @@ import com.natureclean.calculateDistance
 import com.natureclean.checkMapPermissions
 import com.natureclean.distanceTo
 import com.natureclean.getOptimalHike
-import com.natureclean.getTotalDistance
-import com.natureclean.getTotalTime
+
 import com.natureclean.google.presentation.GooglePlacesInfoViewModel
 import com.natureclean.navigateAndClearStack
+import com.natureclean.navigation.Screen
 import com.natureclean.navigation.Tabs
 import com.natureclean.navigation.tabs.bitmapDescriptorFromVector
+import com.natureclean.toWasteSize
+import com.natureclean.toWasteType
 import com.natureclean.ui.components.MainTopAppBar
 import com.natureclean.ui.components.PollutionInfo
 import com.natureclean.viewmodels.MainViewModel
@@ -96,18 +108,26 @@ import java.util.Timer
 import java.util.TimerTask
 
 
+
 @SuppressLint("StateFlowValueCalledInComposition", "MissingPermission", "RememberReturnType")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
 
+    var hikeFinished by remember {mutableStateOf(false)}
+
+    var cleanedPoints by remember { mutableStateOf(0) }
+    var pointsEarned by remember { mutableStateOf(0) }
+    var distanceTravelled by remember { mutableStateOf(0.0) }
+
+    var finishHike by remember { mutableStateOf(false) }
     val glaces: GooglePlacesInfoViewModel = hiltViewModel()
 
     var routeMode by remember { mutableStateOf("walking") }
     val context = LocalContext.current
     val coroutine = rememberCoroutineScope()
 
-    val pointList = mainViewModel.pathPoints.value
+    val pointList = mainViewModel.pathPoints.value.filter { it.isActive != 0 }
     val coordinates = pointList.map { LatLng(it.latitude ?: 0.0, it.longitude ?: 0.0) }
 
     val maxHikeRange = mainViewModel.maxRange.value
@@ -115,6 +135,10 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
 
     var totalDistance by rememberSaveable { mutableStateOf("") }
     var totalTime by rememberSaveable { mutableStateOf("") }
+
+    var previousTravelled = 0.0
+
+    var finishedHike by remember {mutableStateOf(false)}
 
     val points = remember {
         getOptimalHike(
@@ -124,7 +148,8 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
         ).toMutableStateList()
     }
 
-    val startingCoordinates = points[0]
+    var startingCoordinates = points[0]
+
     val timer = remember { Timer() }
 
     val fusedLocationClient = remember {
@@ -136,25 +161,46 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
     val polyline = glaces.polylines.value
     var (greySegment, blueSegment) = splitPolyline(polyline, userLocation)
 
-    remember {timer.schedule(object : TimerTask() {
-        override fun run() {
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location: Location? ->
-                    if (location != null) {
-                        Log.e("location in hike map", location.latitude.toString())
-                        mainViewModel.updateLocation(LatLng(location.latitude, location.longitude))
-                        val (newGreySegment, newBlueSegment) = splitPolyline(polyline, userLocation)
-                        greySegment = newGreySegment
-                        blueSegment = newBlueSegment
-                        mainViewModel.updateUserDistance(calculateDistance(startingCoordinates, LatLng(location.latitude, location.longitude)).toInt())
+    remember {
+        timer.schedule(object : TimerTask() {
+            override fun run() {
+                fusedLocationClient.lastLocation
+                    .addOnSuccessListener { location: Location? ->
+                        if (location != null) {
+                            Log.e("location in hike map", location.latitude.toString())
+                            mainViewModel.updateLocation(
+                                LatLng(
+                                    location.latitude,
+                                    location.longitude
+                                )
+                            )
+                            val (newGreySegment, newBlueSegment) = splitPolyline(
+                                polyline,
+                                userLocation
+                            )
+                            greySegment = newGreySegment
+                            blueSegment = newBlueSegment
+                            distanceTravelled += calculateDistance(
+                                startingCoordinates,
+                                LatLng(location.latitude, location.longitude)
+                            )
+
+                            startingCoordinates = LatLng(location.latitude, location.longitude)
+
+                            if(distanceTravelled != previousTravelled) {
+                                mainViewModel.updateUserDistance(distanceTravelled)
+                            }
+                            previousTravelled = distanceTravelled
+                        }
                     }
-                }
-        }
-    }, 0, 60 * 100)} // 6s
+            }
+        }, 0, 60 * 100)
+    } // 6s
 
 
     DisposableEffect(Unit) {
         onDispose {
+            mainViewModel.resetPath()
             timer.cancel()
         }
     }
@@ -173,11 +219,11 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
             origin = "${userLocation.latitude}, ${userLocation.longitude}",
             waypoints = waypoints,
             mode = routeMode,
-            destination = "${points.last().latitude}, ${points.last().longitude}"
+            destination = "${points.last().latitude}, ${points.last().longitude}",
         )
     }
-    var myLocationEnabled by remember { mutableStateOf(false) } //permissions granted
 
+    var myLocationEnabled by remember { mutableStateOf(false) } //permissions granted
 
 
     val cameraPositionState = rememberCameraPositionState {
@@ -202,16 +248,18 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
         }
 
     var chosenLitter by remember {
-        mutableStateOf<PollutionPoint?>(
+        mutableStateOf(
+            if(latLngToPointMap.size > 1 && points.size > 1){
             latLngToPointMap.getValue(
                 points[1]// [0] is always user location
-            )
+            )} else null
         )
     }
 
     val addState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
     val sheetState =
         rememberBottomSheetScaffoldState(bottomSheetState = addState)
+
 
     fun openSheet() {
         coroutine.launch {
@@ -229,7 +277,24 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
         }
     }
 
+    if (finishHike) {
+        FinishDialog(onAgree = {
+            mainViewModel.setHikeResults(
+                HikeResultsState(
+                    pointsCleared = cleanedPoints,
+                    pointsEarned = pointsEarned,
+                    distanceTravelled = distanceTravelled
+                )
+            ) {
+                navController.navigateAndClearStack(Screen.HikeResults.route)
+            }
+        }
+        ) {
 
+            finishHike = false
+
+        }
+    }
     BottomSheetScaffold(
         scaffoldState = sheetState,
         sheetContent = {
@@ -237,6 +302,20 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                 PollutionInfo(
                     point = point,
                     myLocation = userLocation,
+                    arrowDown = sheetState.bottomSheetState.currentValue == BottomSheetValue.Expanded,
+                    onArrowClick = {
+                        if (sheetState.bottomSheetState.currentValue == BottomSheetValue.Expanded) {
+                            coroutine.launch {
+                                sheetState.bottomSheetState.collapse()
+
+                            }
+                        } else {
+                            coroutine.launch {
+                                sheetState.bottomSheetState.expand()
+
+                            }
+                        }
+                    },
                     remove = {
                         val chosenLitterIndex = points.indexOf(point.latitude?.let {
                             point.longitude?.let { it1 ->
@@ -246,12 +325,7 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                                 )
                             }
                         })
-                        Log.e("POINTS BEFORE RE", points.toString())
-                        Log.e("POINTS SIZE B4 RE", points.size.toString())
-
                         points.removeAt(chosenLitterIndex)
-                        Log.e("POINTS AFTER RE", points.toString())
-                        Log.e("POINTS SIZE AFTER RE", points.size.toString())
                         val nextPoint = if (chosenLitterIndex < points.size) {
                             points[chosenLitterIndex]
                         } else if (points.isNotEmpty()) {
@@ -265,12 +339,15 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                             null
                         }
                         chosenLitter = latLngToPointMap[nextPoint]
-
-                        glaces.getDirection(
-                            origin = "${userLocation.latitude}, ${userLocation.longitude}",
-                            waypoints = waypoints,
-                            destination = "${points.last().latitude}, ${points.last().longitude}"
-                        )
+                        if(points.size == 1){
+                            hikeFinished = true
+                        }else {
+                            glaces.getDirection(
+                                origin = "${userLocation.latitude}, ${userLocation.longitude}",
+                                waypoints = waypoints,
+                                destination = "${points.last().latitude}, ${points.last().longitude}",
+                            )
+                        }
 
 //                        coroutine.launch {
 //                            animateCamera(
@@ -287,8 +364,51 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                                         it
                                     )
                                 }
-                            }?.let { userLocation.distanceTo(it) }!! < 0.1) {
-                            mainViewModel.cleanPoint(point) {}
+                            }?.let { userLocation.distanceTo(it) }!! < 0.2) {
+                            val chosenLitterIndex = points.indexOf(point.latitude?.let {
+                                point.longitude?.let { it1 ->
+                                    LatLng(
+                                        it,
+                                        it1
+                                    )
+                                }
+                            })
+                            Log.e("POINTS BEFORE RE", points.toString())
+                            Log.e("POINTS SIZE B4 RE", points.size.toString())
+
+                            points.removeAt(chosenLitterIndex)
+                            Log.e("POINTS AFTER RE", points.toString())
+                            Log.e("POINTS SIZE AFTER RE", points.size.toString())
+                            val nextPoint = if (chosenLitterIndex < points.size) {
+                                points[chosenLitterIndex]
+                            } else if (points.isNotEmpty()) {
+                                points.last()
+                            } else {
+                                null
+                            }
+                            val waypoints = if (points.size > 1) {
+                                points.subList(1, points.size - 1)
+                            } else {
+                                null
+                            }
+                            chosenLitter = latLngToPointMap[nextPoint]
+                            mainViewModel.cleanPoint(point) {
+                                cleanedPoints += 1
+                                pointsEarned += point.rating
+                            }
+                            Toast.makeText(context, "Trash has been cleaned", Toast.LENGTH_LONG)
+                                .show()
+                            if(points.size == 1){
+                                hikeFinished = true
+                            }else {
+                                glaces.getDirection(
+                                    origin = "${userLocation.latitude}, ${userLocation.longitude}",
+                                    waypoints = waypoints,
+                                    destination = "${points.last().latitude}, ${points.last().longitude}",
+
+                                    )
+                            }
+
                         } else {
                             Toast.makeText(context, "You must nearby the point", Toast.LENGTH_LONG)
                                 .show()
@@ -297,11 +417,11 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                 )
             }
         },
-        sheetShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
     ) {
 
         if (points.isNotEmpty()) {
-            if (points.size > 1) {
+            if (points.size > 1 && !hikeFinished)  {
                 val dot: PatternItem = Dot()
                 val gap: PatternItem = Gap(10f)
                 val pattern = listOf(gap, dot)
@@ -327,7 +447,7 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                                             point.longitude
                                         )
                                     ),
-                                    icon = bitmapDescriptorFromVector(context, R.drawable.litter),
+                                    icon = bitmapDescriptorFromVector(context, R.drawable.litter_map),
                                     onClick = {
                                         coroutine.launch {
                                             animateCamera(
@@ -409,7 +529,45 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                                         waypoints = waypoints,
                                         mode = routeMode,
                                         destination = "${points.last().latitude}, ${points.last().longitude}"
-                                    )
+                                    ) {
+                                        routeMode = "walking"
+                                    }
+                                }
+                                .padding(8.dp)
+                        )
+                        Icon(
+                            imageVector = Icons.Filled.SportsScore,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(start = 16.dp, top = 64.dp)
+                                .align(Alignment.TopStart)
+                                .background(Color.White, shape = CircleShape)
+                                .clip(CircleShape)
+                                .clickable {
+                                    finishHike = true
+                                }
+                                .padding(8.dp)
+                        )
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(end = 10.dp, top = 64.dp)
+                                .align(Alignment.TopEnd)
+                                .background(Color.White, shape = CircleShape)
+                                .clip(CircleShape)
+                                .clickable {
+                                    val waypoints = if (points.size > 1) {
+                                        points.subList(1, points.size - 1)
+                                    } else {
+                                        null
+                                    }
+                                    glaces.getDirection(
+                                        origin = "${userLocation.latitude}, ${userLocation.longitude}",
+                                        waypoints = waypoints,
+                                        destination = "${points.last().latitude}, ${points.last().longitude}",
+
+                                        )
                                 }
                                 .padding(8.dp)
                         )
@@ -435,14 +593,35 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
                     }
                 }
             } else {
-                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Currently no trash points in hike")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = {navController.navigateAndClearStack(Tabs.Map.route)}){
-                        Text("Get back")
+                    if(hikeFinished) {
+                        mainViewModel.setHikeResults(
+                            HikeResultsState(
+                                pointsCleared = cleanedPoints,
+                                pointsEarned = pointsEarned,
+                                distanceTravelled = distanceTravelled
+                            )
+                        ) {}
+                        HikeResults(mainViewModel = mainViewModel, navController = navController)
+                    }else{
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                "Currently no trash points active in hike, please generate new hike path",
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(onClick = { mainViewModel.resetPath(); navController.navigateAndClearStack(Tabs.Map.route) }) {
+                                Text("Get back")
+                            }
+
+                        }
                     }
 
-                }
+
+
             }
         } else {
             CircularProgressIndicator()
@@ -450,119 +629,6 @@ fun HikeMap(mainViewModel: MainViewModel, navController: NavController) {
     }
 
 }
-
-//@SuppressLint("StateFlowValueCalledInComposition")
-//@Composable
-//fun GoogleMapView(
-//    modifier: Modifier,
-//    onMapLoaded: () -> Unit,
-//    googlePlacesInfoViewModel: GooglePlacesInfoViewModel
-//) {
-//
-//
-//
-//
-//    val dot: PatternItem = Dot()
-//    val gap: PatternItem = Gap(10f)
-//    val pattern = listOf(gap, dot)
-//
-//
-//    val context = LocalContext.current
-//    val singapore = LatLng(1.35, 103.87)
-//    val singapore2 = LatLng(1.40, 103.77)
-//
-//    var pos by remember {
-//        mutableStateOf(LatLng(singapore.latitude, singapore.longitude))
-//    }
-//
-//
-//    var poi by remember {
-//        mutableStateOf("")
-//    }
-//    val _makerList: MutableList<LatLng> = mutableListOf<LatLng>()
-//
-//    _makerList.add(singapore)
-//    _makerList.add(singapore2)
-//
-//    var pos2 by remember {
-//        mutableStateOf(_makerList)
-//    }
-//
-//    val cameraPositionState = rememberCameraPositionState {
-//        position = CameraPosition.fromLatLngZoom(singapore, 11f)
-//    }
-//
-//    var mapProperties by remember {
-//        mutableStateOf(MapProperties(mapType = MapType.NORMAL))
-//    }
-//    var uiSettings by remember {
-//        mutableStateOf(
-//            MapUiSettings(compassEnabled = false)
-//        )
-//    }
-//
-//    GoogleMap(
-//        modifier = modifier,
-//        cameraPositionState = cameraPositionState,
-//        properties = mapProperties,
-//        uiSettings = uiSettings,
-//        onMapLoaded = onMapLoaded,
-//        googleMapOptionsFactory = {
-//            GoogleMapOptions().camera(
-//                CameraPosition.fromLatLngZoom(
-//                    singapore,
-//                    11f
-//                )
-//            )
-//        },
-//        onMapClick = {
-//
-//            pos2.add(it)
-//            pos = it
-//        },
-//        onPOIClick = {
-//            poi = it.name
-//
-//            Log.i("asdasd", "asdasd")
-//            googlePlacesInfoViewModel.getDirection(
-//                origin = "${singapore.latitude}, ${singapore.longitude}",
-//                destination = "${it.latLng.latitude}, ${it.latLng.longitude}",
-//                waypoints =
-//            )
-//
-//
-//        }
-//    ) {
-//        // Drawing on the map is accomplished with a child-based API
-//        val markerClick: (Marker) -> Boolean = {
-//
-//            false
-//        }
-//        pos2.forEach { posistion ->
-//            Marker(
-//                state = MarkerState(posistion),
-//                title = "Singapore ",
-//                snippet = "Marker in Singapore ${posistion.latitude}, ${posistion.longitude}",
-//                onClick = {
-//                    Log.i("size ", googlePlacesInfoViewModel.polyLinesPoints.value.size.toString())
-//                    true
-//                },
-//                icon = bitmapDescriptorFromVector(context, R.drawable.litter),
-//            )
-//        }
-//        Polyline(
-//            points = googlePlacesInfoViewModel.polyLinesPoints.value,
-//            onClick = {
-//                Log.i("size ", googlePlacesInfoViewModel.polyLinesPoints.value.size.toString())
-//            },
-//            color = Color.Blue,
-//            pattern = pattern,
-//            width = 15f
-//
-//        )
-//    }
-//}
-
 private const val EARTH_RADIUS = 6371.0 // Earth's radius in kilometers
 
 private fun distanceBetweenPoints(point1: LatLng, point2: LatLng): Double {
@@ -607,3 +673,67 @@ suspend fun animateCamera(
     )
 }
 
+
+@Composable
+fun FinishDialog(onAgree: () -> Unit, onCancel: () -> Unit) {
+    AlertDialog(
+        title = {
+            Text(
+                text = "Do you want to finish your hike?",
+                color = Color.Black,
+                fontWeight = FontWeight(700),
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Are you sure you want to finish your hike. You will not be able to come back if you agree.",
+                    color = Color.Black,
+                    fontWeight = FontWeight(700),
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        },
+        onDismissRequest = {
+            onCancel()
+        },
+        buttons = {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick = {
+                        onCancel()
+                    },
+                ) { Text("Cancel") }
+                Button(
+                    onClick = {
+                        onAgree()
+                    },
+                ) { Text("Finish") }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+        },
+        //Shape of the ALERT dialog
+        shape = RoundedCornerShape(10.dp),
+        //Disabling default alert dialog width
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        //Main modifier of the alert dialog box
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .wrapContentHeight()
+    )
+}

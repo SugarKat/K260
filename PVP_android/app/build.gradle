@@ -98,6 +98,9 @@ dependencies {
     implementation  "androidx.datastore:datastore-core:$proto_datastore_version"
     implementation "androidx.datastore:datastore:$proto_datastore_version"
 
+    //PIE CHART
+    implementation "com.github.tehras:charts:0.2.4-alpha"
+
 }
 wire {
     kotlin {}

@@ -13,6 +13,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.natureclean.api.Backend
 import com.natureclean.api.model.*
 import com.natureclean.navigation.Tabs
+import com.natureclean.navigation.screens.HikeResults
+import com.natureclean.navigation.screens.HikeResultsState
 import com.natureclean.proto.DataStoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
@@ -53,6 +55,11 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
 
+
+    var hikeResults = mutableStateOf(HikeResultsState())
+
+    var distanceTravelled = mutableStateOf(0)
+
     var adminData = mutableStateOf<AdminData?>(null)
 
     var errorMessage = mutableStateOf("")
@@ -83,6 +90,11 @@ class MainViewModel @Inject constructor(
         }
     }
 
+
+    fun setHikeResults(newHikeResults: HikeResultsState, callback: () -> Unit){
+        hikeResults.value = newHikeResults
+        callback()
+    }
     @OptIn(ExperimentalMaterialApi::class)
     fun setSheetState(sheetState: BottomSheetScaffoldState) {
         globalSheetState = sheetState
@@ -100,25 +112,13 @@ class MainViewModel @Inject constructor(
         pathPoints.value = pollutionPoints.value
     }
 
-    fun setPathCoordinates(coordinates: List<PollutionPoint>) {
 
-        pathPoints.value = coordinates
+    fun resetPath(){
+        pathPoints.value = emptyList()
     }
-
-    fun topBarAction(route: String?) {
-        when (route) {
-//            Tabs.Map.route ->{
-//                showBinAdd.value = false
-//                showPollutionAdd.value = true
-//            }
-////            Tabs.Containers.route ->{
-////                showPollutionAdd.value = false
-////                showBinAdd.value = true
-////            }
-//            else ->{
-//
-//            }
-        }
+    fun setPathCoordinates(coordinates: List<PollutionPoint>) {
+        pathPoints.value = emptyList()
+        pathPoints.value = coordinates
     }
 
 
@@ -210,16 +210,23 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun updateUserDistance(distance: Int) {
-        user.value?.let {
-            viewModelScope.launch {
+    fun updateUserDistance(distance: Double) {
+        viewModelScope.launch {
+        val updatedUser = user.value?.user?.id?.let { api.getUser(it) }
+            updatedUser.let {
                 when (val response =
-                    it.user?.let { it1 ->
-                        val distanceTravelled = it1.distance_travelled + distance
-                        api.updateUser(
-                            it1.copy(distance_travelled = distanceTravelled)
-                        )
-                    }) {
+                    it.let { it1 ->
+                        val distanceTravelled = it1?.data?.distance_travelled?.plus(distance)
+                        it1?.data?.let { it2 ->
+                            distanceTravelled?.let { it3 -> it2.copy(distance_travelled = it3) }
+                                ?.let { it4 ->
+                                    api.updateUser(
+                                        it4
+                                    )
+                                }
+                        }
+                    }
+                ) {
                     is Resource.Success -> {
                         Log.i("SUCCESS", "SUCES")
 
@@ -279,13 +286,22 @@ class MainViewModel @Inject constructor(
                     point = point.copy(isActive = 0)
                 )) {
                 is Resource.Success -> {
-                    Log.e("SUCCES", "SUCCESS")
-                    user.value?.let {
-                        val points = it.user?.points
-                        user.value!!.user?.let { it1 -> api.updateUser(user = it1.copy(points = points?.plus(
-                            point.rating
-                        ) ?: point.rating)) }
+                    val updatedUser = user.value?.user?.id?.let { api.getUser(it) }
+                    updatedUser.let{ updUsr->
+                        updUsr.let { it1 ->
+                            it1?.data?.copy(points = updUsr?.data?.points?.plus(
+                                point.rating
+                            ) ?: point.rating)?.let { api.updateUser(user = it) }
+                        }
                     }
+
+
+//                    user.value?.let {
+//                        val points = it.user?.points
+//                        user.value!!.user?.let { it1 -> api.updateUser(user = it1.copy(points = points?.plus(
+//                            point.rating
+//                        ) ?: point.rating)) }
+//                    }
                     callback()
                 }
 

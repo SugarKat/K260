@@ -16,6 +16,7 @@ import com.codelab.android.datastore.User
 import com.natureclean.navigation.screens.AdminPanel
 import com.natureclean.navigation.tabs.Account
 import com.natureclean.navigation.screens.HikeMap
+import com.natureclean.navigation.screens.HikeResults
 import com.natureclean.navigation.screens.Login
 import com.natureclean.navigation.screens.ManualHike
 import com.natureclean.navigation.screens.Register
@@ -81,6 +82,9 @@ fun Navigation(
                     mainViewModel = mainViewModel,
                     navController = navController
                 )
+            }
+            composable(Screen.HikeResults.route){
+                HikeResults(mainViewModel, navController)
             }
 
         }

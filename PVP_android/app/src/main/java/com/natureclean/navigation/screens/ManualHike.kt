@@ -75,7 +75,7 @@ fun ManualHike(mainViewModel: MainViewModel, navController: NavController) {
                 var selected by remember { mutableStateOf(false) }
                 Row(modifier = Modifier
                     .fillMaxWidth()
-                    .background(if (selected) Color(0xFF00645a) else Color.LightGray)
+                    .background(if (selected) DARK_GREEN else Color.LightGray)
                     .clickable {
                         if (selected) {
                             selected = false
@@ -89,7 +89,7 @@ fun ManualHike(mainViewModel: MainViewModel, navController: NavController) {
                     }
                     .padding(vertical = 16.dp, horizontal = 8.dp)) {
                     Text(point.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    Text(" Distance from you $distance km")
+                    Text(" Distance from you ${String.format("%.2f", distance)} km")
                     Spacer(modifier = Modifier.weight(1f))
                     if (selected) {
                         Icon(imageVector = Icons.Filled.Check, "", tint = Color.Blue)
@@ -101,11 +101,12 @@ fun ManualHike(mainViewModel: MainViewModel, navController: NavController) {
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = {
+                mainViewModel.resetPath()
                 mainViewModel.setPathCoordinates(chosenPoints)
                 navController.navigate(Screen.HikeMap.route)
             },
             colors = ButtonDefaults.buttonColors(
-                Color(0xFF00645a),
+                DARK_GREEN,
             ),
             enabled = chosenPoints.isNotEmpty()
         ) {

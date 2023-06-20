@@ -16,7 +16,7 @@ message UserObj{
   int32 points = 4;
   string created_at = 5;
   string updated_at = 6;
-  int32 distance_travelled = 7;
+  double distance_travelled = 7;
 
 }
 

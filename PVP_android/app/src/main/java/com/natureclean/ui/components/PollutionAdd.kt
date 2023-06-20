@@ -1,6 +1,7 @@
 package com.natureclean.ui.components
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
@@ -8,8 +9,12 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -141,6 +146,8 @@ fun PollutionAdd(closeDialog: () -> Unit, function: (String, String, Int, Int) -
 fun PollutionInfo(
     point: PollutionPoint,
     myLocation: LatLng,
+    arrowDown: Boolean,
+    onArrowClick: () -> Unit = {},
     remove: () -> Unit,
     clean: () -> Unit
 ) {
@@ -156,25 +163,42 @@ fun PollutionInfo(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Litter info:",
-            color = Color.Black,
-            fontWeight = FontWeight(700),
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp)
-        )
+        Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.Center) {
+            Text(
+                text = "Litter info",
+                color = Color.Black,
+                fontWeight = FontWeight(700),
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(bottom = 24.dp).offset(x = 24.dp)
+            )
+            Spacer(modifier = Modifier.width(24.dp))
+            if(arrowDown){
+                Icon(
+                    Icons.Filled.ArrowDownward,
+                    contentDescription = "",
+                    tint = DARK_GREEN,
+                    modifier = Modifier.clickable { onArrowClick() }
+                )
+            }else {
+                Icon(
+                    Icons.Filled.ArrowUpward,
+                    contentDescription = "",
+                    tint = DARK_GREEN,
+                    modifier = Modifier.clickable { onArrowClick() }
+                )
+            }
+        }
         Text("Name: ${point.name}")
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Description: ${point.description}")
+        Text("Description: ${point.description}", textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(16.dp))
         Text("Litter type: ${point.type.toWasteType()}")
         Spacer(modifier = Modifier.height(16.dp))
         Text("Report count: ${point.reportCount}")
         Spacer(modifier = Modifier.height(16.dp))
-        Text("$distance km")
+        Text("Distance: ${String.format("%.2f", distance)} km")
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier

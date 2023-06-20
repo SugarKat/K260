@@ -14,6 +14,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.ExperimentalMaterialApi
@@ -36,8 +37,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -51,6 +54,7 @@ import com.natureclean.api.model.PollutionPoint
 import com.natureclean.checkMapPermissions
 import com.natureclean.toBinSize
 import com.natureclean.toBinType
+import com.natureclean.ui.components.DARK_GREEN
 import com.natureclean.ui.components.PollutionAdd
 import com.natureclean.ui.components.PollutionClean
 import com.natureclean.viewmodels.MainViewModel
@@ -197,12 +201,14 @@ fun Map(mainViewModel: MainViewModel) {
                             Column(
                                 modifier = Modifier
                                     .padding(16.dp)
-                                    .background(Color.White),
+                                    .background(DARK_GREEN, shape = RoundedCornerShape(16.dp)),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text(container.name)
-                                Text(container.size.toBinSize())
-                                Text(container.type.toBinType())
+                                Text(text = "Trash bin", color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Black, modifier = Modifier.padding(horizontal = 8.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(text = "Name: ${container.name}", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp))
+                                Text(text = "Size: ${container.size.toBinSize()}", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp))
+                                Text(text = "Type: ${container.type.toBinType()}", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 6.dp))
                             }
                         }
                     )

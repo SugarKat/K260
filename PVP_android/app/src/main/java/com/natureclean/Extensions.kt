@@ -34,8 +34,8 @@ fun checkMapPermissions(context: Context): MutableList<String> {
 }
 
 
-fun calculateDistance(myDistance: LatLng, containerDistance: LatLng?): String? {
-    var distanceTo: String? = null
+fun calculateDistance(myDistance: LatLng, containerDistance: LatLng?): Double? {
+    var distanceTo: Double? = null
     /*
     Calculate the great circle distance between two points
     on the earth (specified in decimal degrees)
@@ -56,8 +56,8 @@ fun calculateDistance(myDistance: LatLng, containerDistance: LatLng?): String? {
         ) *
                 Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2)
         val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-        val distance = (R * c) // convert to km
-        distanceTo = String.format("%.2f", distance) // format to 2 decimal places
+        distanceTo = (R * c) // convert to km
+        //distanceTo = String.format("%.2f", distance) // format to 2 decimal places
 
     }
     return distanceTo
@@ -65,6 +65,9 @@ fun calculateDistance(myDistance: LatLng, containerDistance: LatLng?): String? {
 
 
 fun calculateDistance(point1: LatLng, point2: LatLng): Double {
+    if(point1.latitude == point2.latitude && point1.longitude == point2.longitude){
+        return 0.0
+    }
     val lat1 = point1.latitude
     val lat2 = point2.latitude
     val lon1 = point1.longitude
@@ -80,11 +83,6 @@ fun calculateDistance(point1: LatLng, point2: LatLng): Double {
 
     return r * c
 }
-
-fun Double.toRadians(): Double {
-    return this * PI / 180
-}
-
 
 fun getOptimalHike(
     coordinates: List<LatLng>,
@@ -160,9 +158,6 @@ fun List<LatLng>.formatGoogleWaypoints(): String {
     return sb.toString()
 }
 
-fun Int.convertTypeToString(){
-
-}
 fun Int.toWasteType(): String {
     return typePollutionValues.getOrDefault(this, "Nenurodyta")
 }
@@ -183,25 +178,6 @@ fun getDistance(latlng1: LatLng, latlng2: LatLng): Double {
     val a = sin(dLat/2) * sin(dLat/2) + cos(latlng1.latitude * PI / 180) * cos(latlng2.latitude * PI / 180) * sin(dLng/2) * sin(dLng/2)
     val c = 2 * atan2(sqrt(a), sqrt(1-a))
     return R * c
-}
-
-fun getTotalDistance(coords: List<LatLng>,userLoc: LatLng): String {
-    var totalDistance = 0.0
-    var currentLoc = userLoc
-    for (i in coords.indices) {
-        val distance = getDistance(currentLoc, coords[i])
-        totalDistance += distance
-        currentLoc = coords[i]
-    }
-    return String.format("%.2f", totalDistance)
-}
-
-fun getTotalTime(distance: Double): String {
-    val walkingSpeed = 4.0 // km/hour
-    val totalTime = distance / walkingSpeed
-    val hours = totalTime.toInt()
-    val minutes = ((totalTime - hours) * 60).toInt()
-    return "$hours hours, $minutes minutes"
 }
 
 fun NavController.navigateAndClearStack(route: String){

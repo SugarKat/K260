@@ -8,6 +8,7 @@ sealed class Screen(val route: String){
     object HikeMap: Screen("hike_map")
     object ManualHike: Screen("manual_hike")
     object AdminPanel: Screen("admin_panel")
+    object HikeResults: Screen("hike_results")
 
     fun withArgs(vararg args: Pair<String, String>): String {
         var res = route
